@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
-
-type SearchType = 'song' | 'album' | 'artist';
+import type { SearchType } from '../types/search';
 
 const SearchToggle: React.FC = () => {
   const [selected, setSelected] = useState<SearchType>('song');
