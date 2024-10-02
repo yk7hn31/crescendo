@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { SetStateAction, Dispatch } from 'react';
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
-import type { SearchType } from '../types/search';
+import type { SearchType } from '@/types/search';
 
-const SearchToggle: React.FC = () => {
-  const [selected, setSelected] = useState<SearchType>('song');
+interface SearchToggleProps {
+  searchType: string;
+  setSearchType: Dispatch<SetStateAction<SearchType>>;
+}
 
-  const handleValueChange = (value: SearchType) => value && setSelected(value);
+const SearchToggle: React.FC<SearchToggleProps> = ({ searchType, setSearchType }) => {
+  const handleValueChange = (value: SearchType) => value && setSearchType(value);
 
   return (
     <ToggleGroup type="single" className='justify-start'
-      value={selected}
+      value={searchType}
       onValueChange={handleValueChange}
     >
       <ToggleGroupItem value="song">Song</ToggleGroupItem>
