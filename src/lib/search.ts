@@ -1,7 +1,6 @@
-import fetch from 'node-fetch';
-import { SongInfo, AlbumInfo } from './searchTypes';
-import { RawSongInfo, RawAlbumInfo } from './searchTypes';
-import { SongSearchOptions, AlbumSearchOptions } from './searchTypes'
+import type { SongInfo, AlbumInfo } from '@/types/types';
+import type { RawSongInfo, RawAlbumInfo } from '@/types/types';
+import type { SongSearchOptions, AlbumSearchOptions } from '@/types/types'
 
 type RawInfo = {
   results: RawSongInfo[] | RawAlbumInfo[]

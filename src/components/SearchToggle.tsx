@@ -1,9 +1,9 @@
 import React, { SetStateAction, Dispatch } from 'react';
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
-import type { SearchType } from '@/types/search';
+import type { SearchType } from '@/types/types';
 
 interface SearchToggleProps {
-  searchType: string;
+  searchType: SearchType;
   setSearchType: Dispatch<SetStateAction<SearchType>>;
 }
 
