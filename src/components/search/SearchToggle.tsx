@@ -1,14 +1,16 @@
 import React, { SetStateAction, Dispatch } from 'react';
-import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { SearchType } from '@/types/types';
 
 interface SearchToggleProps {
   searchType: SearchType;
-  setSearchType: Dispatch<SetStateAction<SearchType>>;
+  setParams: Dispatch<SetStateAction<{query: string, type: SearchType}>>;
 }
 
-const SearchToggle: React.FC<SearchToggleProps> = ({ searchType, setSearchType }) => {
-  const handleValueChange = (value: SearchType) => value && setSearchType(value);
+const SearchToggle: React.FC<SearchToggleProps> = ({ searchType, setParams }) => {
+  const handleValueChange = (type: SearchType) => {
+    if (type) setParams(p => ({...p, type}));
+  }
 
   return (
     <ToggleGroup type="single" className='justify-start'

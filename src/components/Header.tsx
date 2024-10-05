@@ -1,16 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import { motion } from "framer-motion";
-
-interface HeaderProps {
-  isFormActive: boolean;
-}
+import FormActive from "@/store/FormActive";
 
 const headerVariants = {
   visible: { opacity: 1, y: 0 },
   hidden: { opacity: 0, y: -20 }
 };
 
-const Header: React.FC<HeaderProps> = ({ isFormActive }) => {
+const Header: React.FC = () => {
+  const { isFormActive } = useContext(FormActive);
+
   return (
     <motion.div
       variants={headerVariants}
@@ -20,7 +19,7 @@ const Header: React.FC<HeaderProps> = ({ isFormActive }) => {
         type: "spring",
         stiffness: 260,
         damping: 20,
-        duration: 0.5
+        duration: 0.3
       }}
     >
       <h1 className='mb-8 font-mono font-semibold text-4xl'>crescendo.</h1>

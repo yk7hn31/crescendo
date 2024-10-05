@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import SearchForm from '@/components/SearchForm';
+import React from 'react';
+import Content from '@/components/Content';
 import Header from '@/components/Header';
+import { FormActiveProvider } from './store/FormActive';
 
 const App: React.FC = () => {
-  const [isFormActive, setIsFormActive] = useState<boolean>(false);
-
   return (
-    <div className="relative flex flex-col items-center justify-center p-6 h-screen">
-      <Header isFormActive={isFormActive} />
-      <SearchForm formState={[isFormActive, setIsFormActive]} />
-    </div>
+    <FormActiveProvider>
+      <div className="relative flex flex-col items-center justify-center p-6 h-screen">
+        <Header />
+        <Content />
+      </div>
+    </FormActiveProvider>
   );
 };
 
