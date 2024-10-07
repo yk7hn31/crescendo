@@ -1,4 +1,4 @@
-export type SearchType = 'song' | 'album' | 'artist';
+export type SearchType = 'song' | 'album' | 'artist' | 'all';
 
 export interface SongSearchOptions {
   artist?: string;

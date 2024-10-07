@@ -6,7 +6,7 @@ import { FormActiveProvider } from './store/FormActive';
 const App: React.FC = () => {
   return (
     <FormActiveProvider>
-      <div className="relative flex flex-col items-center justify-center p-6 h-screen">
+      <div className="h-screen overflow-hidden">
         <Header />
         <Content />
       </div>

@@ -17,6 +17,7 @@ const SearchToggle: React.FC<SearchToggleProps> = ({ searchType, setParams }) =>
       value={searchType}
       onValueChange={handleValueChange}
     >
+      <ToggleGroupItem value="all">All</ToggleGroupItem>
       <ToggleGroupItem value="song">Song</ToggleGroupItem>
       <ToggleGroupItem value="album">Album</ToggleGroupItem>
       <ToggleGroupItem value="artist">Artist</ToggleGroupItem>

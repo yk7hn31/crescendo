@@ -7,6 +7,12 @@ export default {
   ],
   theme: {
   	extend: {
+			gridTemplateColumns: {
+				'auto-fill': 'repeat(auto-fill, minmax(230px, 1fr))'
+			},
+			width: {
+				'fit': 'fit-content'
+			},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

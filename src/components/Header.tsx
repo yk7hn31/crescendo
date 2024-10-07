@@ -12,6 +12,7 @@ const Header: React.FC = () => {
 
   return (
     <motion.div
+      className='relative flex justify-center top-[40vh]'
       variants={headerVariants}
       initial='visible'
       animate={isFormActive ? 'hidden': 'visible'}
