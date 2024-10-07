@@ -5,17 +5,14 @@ import { Button } from '@/components/ui/button';
 import SearchToggle from './SearchToggle';
 import SearchInput from './SearchInput';
 import FormActiveCtx from '@/store/FormActive';
-import type { SearchType } from '@/types/types';
+import type { ParamsType } from '@/types/types';
 
 interface SearchButtonProps {
   className: string;
 };
 
 interface SearchFormProps {
-  handleSubmit: (e: React.FormEvent) => void;
-  paramState: [{query: string, type: SearchType},
-    Dispatch<SetStateAction<{query: string, type: SearchType}>>
-  ];
+  paramState: [ParamsType, Dispatch<SetStateAction<ParamsType>>];
   isMobile: boolean;
 }
 
@@ -69,7 +66,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ className }) => {
   );
 }
 
-const SearchForm: React.FC<SearchFormProps> = ({ paramState, handleSubmit, isMobile }) => {
+const SearchForm: React.FC<SearchFormProps> = ({ paramState, isMobile }) => {
   const { isFormActive, setIsFormActive } = useContext(FormActiveCtx);
   const inputRef = useRef<HTMLInputElement>(null);
   const [params, setParams] = paramState;
@@ -92,7 +89,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ paramState, handleSubmit, isMob
 
   return (
     <motion.form
-      onSubmit={handleSubmit}
+      action='#'
       className={`flex flex-col gap-y-2 ${isMobile ? 'w-full' : 'w-1/2'} max-w-[530px] min-w-[330px]`}
       variants={formVariants}
       initial={false}

@@ -1,8 +1,15 @@
 export type SearchType = 'song' | 'album' | 'artist' | 'all';
 
+export interface ParamsType {
+  query: string;
+  debouncedQuery: string;
+  type: SearchType;
+}
+
 export interface SongSearchOptions {
   artist?: string;
   album?: string;
+  artworkSize?: number;
 }
 
 export interface AlbumSearchOptions {
@@ -23,6 +30,8 @@ export interface SongInfo extends MediaInfo {
   available: boolean;
   trackLength: number;
   trackNumber: number;
+  artwork: string;
+  trackId: number;
 }
 
 export interface AlbumInfo extends MediaInfo {
@@ -30,6 +39,7 @@ export interface AlbumInfo extends MediaInfo {
   trackCount: number;
   releaseDate: Date;
   artwork: string;
+  collectionId: number;
 }
 
 export interface RawMediaInfo {
@@ -37,6 +47,7 @@ export interface RawMediaInfo {
   collectionName: string;
   trackExplicitness: string;
   primaryGenreName: string;
+  artworkUrl100: string;
 }
 
 export interface RawSongInfo extends RawMediaInfo {
@@ -44,10 +55,11 @@ export interface RawSongInfo extends RawMediaInfo {
   trackNumber: number;
   trackTimeMillis: number;
   isStreamable: boolean;
+  trackId: number;
 }
 
 export interface RawAlbumInfo extends RawMediaInfo {
   trackCount: number;
   releaseDate: number;
-  artworkUrl100: string;
+  collectionId: number;
 }

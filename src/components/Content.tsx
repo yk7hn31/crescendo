@@ -1,13 +1,13 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import FormActiveCtx from "@/store/FormActive";
 import useViewport from "@/hooks/useViewport";
 import { searchSong } from "@/lib/search";
-import type { SearchType } from "@/types/types";
+import type { SongInfo, AlbumInfo, ParamsType } from "@/types/types";
 import { SearchForm, SearchButton } from './search/SearchActions';
 import SearchItemList from "./search/SearchItemList";
-import { SearchItem } from "./search/SearchItem";
+import { SearchItem, SearchItemSkeleton } from "./search/SearchItem";
 
 const divVariants = {
   initial: { top: '40vh' },
@@ -24,13 +24,28 @@ const springTransition2 = {
 const Content: React.FC = () => {
   const { isMobile } = useViewport();
   const { isFormActive } = useContext(FormActiveCtx);
-  const [params, setParams] = useState<{query:string,type:SearchType}>({query:'',type:'all'});
+  const [params, setParams] = useState<ParamsType>({query:'',debouncedQuery:'',type:'all'});
+  const [results, setResults] = useState<(SongInfo | AlbumInfo)[]>([]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    console.log(params.type, await searchSong(params.query));
-    // TODO: use debouncing for API calls
-  }
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setParams(p => ({...p, debouncedQuery: p.query}))
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    }
+  }, [params.query]);
+
+  useEffect(() => {
+    (async () => {
+      if (params.debouncedQuery) {
+        setResults(await searchSong(params.debouncedQuery));
+      } else {
+        setResults([]);
+      }
+    })();
+  }, [params.debouncedQuery]);
 
   return (<>
     <AnimatePresence initial={false}>
@@ -48,22 +63,33 @@ const Content: React.FC = () => {
       <AnimatePresence>
         {(isFormActive || !isMobile) && 
         <SearchForm key='search-form' 
-          handleSubmit={handleSubmit} paramState={[params, setParams]} isMobile={isMobile}
+          paramState={[params, setParams]} isMobile={isMobile}
         />}
         {isFormActive && 
         <SearchItemList key='search-item-list' isMobile={isMobile}>
-          <SearchItem title='Misty' description='Calvin Jung' duration='3:30' />
-          <SearchItem title='Misty 2' description='Lucas Han' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
-          <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
+          {results.length ? results.map((result: SongInfo | AlbumInfo) => {
+            let extra: string = '';
+            let key: string = '';
+            if (result.type === 'song') {
+              const minutes = Math.floor(result.trackLength / 60000);
+              const seconds = Math.floor((result.trackLength % 60000) / 1000);
+              extra = minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+              key = 't' + result.trackId;
+            } else if (result.type === 'album') {
+              extra = `${result.trackCount} tracks`
+              key = 'c' + result.collectionId;
+            }
+            return (
+              <SearchItem
+                key={key}
+                title={result.title} 
+                description={result.artist} 
+                extra={extra} 
+                type={result.type}
+                coverImg={result.artwork}
+              />
+            );
+          }) : <><SearchItemSkeleton /><SearchItemSkeleton /><SearchItemSkeleton /></>}
         </SearchItemList>}
       </AnimatePresence>
     </motion.div>
