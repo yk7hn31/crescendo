@@ -8,7 +8,7 @@ interface SearchItemListProps {
 }
 
 const itemListVariants = {
-  visible: { y: 0, opacity: 1 },
+  visible: { y: 0, opacity: 1, transition: {delay: 0.2} },
   hidden: { y: 30, opacity: 0 }
 }
 

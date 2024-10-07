@@ -89,7 +89,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ paramState, isMobile }) => {
 
   return (
     <motion.form
-      action='#'
+      onSubmit={e => e.preventDefault()}
       className={`flex flex-col gap-y-2 ${isMobile ? 'w-full' : 'w-1/2'} max-w-[530px] min-w-[330px]`}
       variants={formVariants}
       initial={false}

@@ -22,6 +22,7 @@ export interface MediaInfo {
   artist: string;
   genre: string;
   explicit: boolean;
+  artwork: string;
 }
 
 export interface SongInfo extends MediaInfo {
@@ -30,7 +31,6 @@ export interface SongInfo extends MediaInfo {
   available: boolean;
   trackLength: number;
   trackNumber: number;
-  artwork: string;
   trackId: number;
 }
 
@@ -38,28 +38,52 @@ export interface AlbumInfo extends MediaInfo {
   type: 'album';
   trackCount: number;
   releaseDate: Date;
-  artwork: string;
   collectionId: number;
+}
+
+export interface ArtistInfo {
+  type: 'artist';
+  name: string;
+  genre: string;
+  amLink: string;
+  artistId: number;
 }
 
 export interface RawMediaInfo {
   artistName: string;
   collectionName: string;
-  trackExplicitness: string;
   primaryGenreName: string;
   artworkUrl100: string;
 }
 
 export interface RawSongInfo extends RawMediaInfo {
+  wrapperType: 'track';
   trackName: string;
   trackNumber: number;
   trackTimeMillis: number;
+  trackExplicitness: string;
   isStreamable: boolean;
   trackId: number;
 }
 
 export interface RawAlbumInfo extends RawMediaInfo {
+  wrapperType: 'collection';
   trackCount: number;
   releaseDate: number;
   collectionId: number;
+  collectionExplicitness: string;
+}
+
+export interface RawArtistInfo {
+  wrapperType: 'artist';
+  artistName: string;
+  primaryGenreName: string;
+  artistLinkUrl: string;
+  artistId: number;
+}
+
+export type RawInfoArr = RawSongInfo[] | RawAlbumInfo[] | RawArtistInfo[];
+
+export type RawInfoObject = {
+  results: RawSongInfo[] | RawAlbumInfo[] | RawArtistInfo[]
 }
