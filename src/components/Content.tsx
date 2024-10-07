@@ -5,13 +5,13 @@ import FormActiveCtx from "@/store/FormActive";
 import useViewport from "@/hooks/useViewport";
 import { searchSong } from "@/lib/search";
 import type { SearchType } from "@/types/types";
-import { SearchForm } from './search/SearchActions';
+import { SearchForm, SearchButton } from './search/SearchActions';
 import SearchItemList from "./search/SearchItemList";
 import { SearchItem } from "./search/SearchItem";
 
 const divVariants = {
-  initial: { top: '40vh', y: 65 },
-  focused: { top: 0, y: 50 }
+  initial: { top: '40vh' },
+  focused: { top: 0 }
 }
 
 const springTransition2 = {
@@ -32,12 +32,14 @@ const Content: React.FC = () => {
     // TODO: use debouncing for API calls
   }
 
-  return (
-    // <AnimatePresence>
-    //   {(isMobile && !isFormActive) &&
-    //   <SearchButton key='search-button' />}
-    // </AnimatePresence>
-    <motion.div className="absolute w-full flex flex-col items-center space-y-4"
+  return (<>
+    <AnimatePresence initial={false}>
+      {(isMobile && !isFormActive) &&
+      <SearchButton key='search-button'
+        className='absolute flex w-full top-[40vh] justify-center'
+      />}
+    </AnimatePresence>
+    <motion.div className={`absolute w-full flex flex-col items-center space-y-4 p-6 ${(!isMobile && !isFormActive) && 'translate-y-11'}`}
       variants={divVariants}
       initial='initial'
       animate={isFormActive ? 'focused' : 'initial'}
@@ -49,7 +51,7 @@ const Content: React.FC = () => {
           handleSubmit={handleSubmit} paramState={[params, setParams]} isMobile={isMobile}
         />}
         {isFormActive && 
-        <SearchItemList key='search-item-list'>
+        <SearchItemList key='search-item-list' isMobile={isMobile}>
           <SearchItem title='Misty' description='Calvin Jung' duration='3:30' />
           <SearchItem title='Misty 2' description='Lucas Han' duration='3:30' />
           <SearchItem title='Misty 3' description='Amamiya Yuzuki' duration='3:30' />
@@ -65,7 +67,7 @@ const Content: React.FC = () => {
         </SearchItemList>}
       </AnimatePresence>
     </motion.div>
-  );
+  </>);
 }
 
 export default Content;

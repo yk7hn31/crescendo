@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useContext, useEffect, useRef } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,10 @@ import SearchToggle from './SearchToggle';
 import SearchInput from './SearchInput';
 import FormActiveCtx from '@/store/FormActive';
 import type { SearchType } from '@/types/types';
+
+interface SearchButtonProps {
+  className: string;
+};
 
 interface SearchFormProps {
   handleSubmit: (e: React.FormEvent) => void;
@@ -16,7 +20,7 @@ interface SearchFormProps {
 }
 
 const formVariants = {
-  visible: { y: 0, opacity: 1 },
+  visible: { y: 0, opacity: 1},
   hidden: { y: 30, opacity: 0 }
 };
 
@@ -31,8 +35,8 @@ const blurButtonVariants = {
 };
 
 const buttonVariants = {
-  visible: { opacity: 1, top: '100%', y: 0 },
-  hidden: { opacity: 0, top: '100%', y: -20 }
+  visible: { opacity: 1, y: 70 },
+  hidden: { opacity: 0, y: 90 }
 };
 
 const springTransition = {
@@ -41,7 +45,7 @@ const springTransition = {
   damping: 30
 };
 
-const SearchButton: React.FC = () => {
+const SearchButton: React.FC<SearchButtonProps> = ({ className }) => {
   const { setIsFormActive } = useContext(FormActiveCtx);
 
   const handleButtonClick = () => {
@@ -50,7 +54,7 @@ const SearchButton: React.FC = () => {
 
   return (
     <motion.div
-      className='absolute'
+      className={className}
       variants={buttonVariants}
       initial='hidden'
       animate='visible'
@@ -89,16 +93,17 @@ const SearchForm: React.FC<SearchFormProps> = ({ paramState, handleSubmit, isMob
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className='flex flex-col gap-y-2 w-1/2 max-w-[530px] min-w-[330px]'
+      className={`flex flex-col gap-y-2 ${isMobile ? 'w-full' : 'w-1/2'} max-w-[530px] min-w-[330px]`}
       variants={formVariants}
-      initial={isMobile ? 'hidden' : 'visible'}
+      initial={false}
+      animate='visible'
       transition={springTransition}
       exit='hidden'
     >
       <motion.div layout className='flex space-x-2 items-center'>
         <SearchInput
           key='search-input'
-          placeholder='Search for artists, songs, albums...'
+          placeholder={isMobile ? 'Search...' : 'Search for artists, songs, albums...'}
           value={params.query}
           onChange={handleQueryChange}
           onFocus={handleInputFocus}

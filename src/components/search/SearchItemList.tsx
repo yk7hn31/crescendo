@@ -4,6 +4,7 @@ import FormActiveCtx from "@/store/FormActive";
 
 interface SearchItemListProps {
   children: React.ReactNode;
+  isMobile: boolean;
 }
 
 const itemListVariants = {
@@ -11,12 +12,12 @@ const itemListVariants = {
   hidden: { y: 30, opacity: 0 }
 }
 
-const SearchItemList: React.FC<SearchItemListProps> = ({ children }) => {
+const SearchItemList: React.FC<SearchItemListProps> = ({ children, isMobile }) => {
   const { isFormActive } = useContext(FormActiveCtx);
 
   return (
     <motion.div
-      className='w-7/12 pb-8 space-y-[-1px]'
+      className={`${isMobile ? 'w-full' : 'w-7/12'} space-y-[-1px]`}
       variants={itemListVariants}
       initial='hidden'
       animate={isFormActive ? 'visible' : 'hidden'}
