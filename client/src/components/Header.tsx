@@ -1,14 +1,12 @@
-import React, { useContext } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import FormActive from "@/store/FormActive";
 
-const headerVariants = {
-  visible: { opacity: 1, y: 0 },
-  hidden: { opacity: 0, y: -20 }
-};
+import { useSearchState } from "@/hooks/useSearch";
+
+import { headerVariants, springTransition } from "@/definitions/variants";
 
 const Header: React.FC = () => {
-  const { isFormActive } = useContext(FormActive);
+  const { isFormActive } = useSearchState();
 
   return (
     <motion.div
@@ -16,12 +14,7 @@ const Header: React.FC = () => {
       variants={headerVariants}
       initial='visible'
       animate={isFormActive ? 'hidden': 'visible'}
-      transition={{
-        type: "spring",
-        stiffness: 260,
-        damping: 20,
-        duration: 0.3
-      }}
+      transition={springTransition}
     >
       <h1 className='mb-8 font-mono font-semibold text-4xl'>crescendo.</h1>
     </motion.div>

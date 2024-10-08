@@ -1,16 +1,16 @@
 import React from 'react';
 import Content from '@/components/Content';
 import Header from '@/components/Header';
-import { FormActiveProvider } from './store/FormActive';
+import { SearchProvider } from './store/Search';
 
 const App: React.FC = () => {
   return (
-    <FormActiveProvider>
+    <SearchProvider>
       <div className="h-screen overflow-hidden">
         <Header />
         <Content />
       </div>
-    </FormActiveProvider>
+    </SearchProvider>
   );
 };
 

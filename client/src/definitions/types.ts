@@ -1,10 +1,4 @@
-export type SearchType = 'song' | 'album' | 'artist' | 'all';
-
-export interface ParamsType {
-  query: string;
-  debouncedQuery: string;
-  type: SearchType;
-}
+export type SearchEntity = 'song' | 'album' | 'artist' | 'all';
 
 export type ItemDetails = SongDetails | AlbumDetails | ArtistDetails;
 
@@ -40,3 +34,14 @@ export interface ArtistDetails {
   artistLinkUrl: string;
   artistId: number;
 }
+
+export type SearchState = {
+  isFormActive: boolean;
+  searchTerm: string;
+  entityType: SearchEntity;
+}
+
+export type SearchAction =
+  | { type: 'SET_FORM_ACTIVE', payload: boolean }
+  | { type: 'SET_SEARCH_TERM', payload: string }
+  | { type: 'SET_ENTITY_TYPE', payload: SearchEntity }

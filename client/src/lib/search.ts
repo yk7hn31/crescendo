@@ -1,4 +1,4 @@
-import type { SearchType, SongDetails, AlbumDetails } from '@/types/types';
+import type { SearchEntity, SongDetails, AlbumDetails, ItemDetails } from '@/definitions/types';
 
 interface SongSearchOptions {
   artist?: string;
@@ -11,7 +11,7 @@ interface AlbumSearchOptions {
   artworkSize?: number;
 }
 
-async function getSearchResult(term: string, type: SearchType) {
+async function getSearchResult(term: string, type: SearchEntity) {
   const searchURI: string = `http://localhost:8080/search?term=${encodeURIComponent(term)}&entity=${type}`;
   const response = await fetch(searchURI, { redirect: 'manual' });
   const searchData = await response.json();
@@ -57,4 +57,32 @@ async function searchAll(term: string) {
   return await getSearchResult(term, 'all');
 }
 
-export { searchSong, searchAlbum, searchArtist, searchAll }
+function formatSearchItems(item: ItemDetails) {
+  let itemKey: string = '';
+  const itemInfo = { type: item.wrapperType, title: '', description: '', extra: '', coverImg: '' };
+
+  if (item.wrapperType === 'track' || item.wrapperType === 'collection') {
+    itemInfo.coverImg = item.artworkUrl100;
+    itemInfo.description = item.artistName;
+    if (item.wrapperType === 'track') {
+      const minutes = Math.floor(item.trackTimeMillis / 60000);
+      const seconds = Math.floor((item.trackTimeMillis % 60000) / 1000);
+      itemKey = 't' + item.trackId;
+      itemInfo.title = item.trackName
+      itemInfo.extra = minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+    } else if (item.wrapperType === 'collection') {
+      itemKey = 'c' + item.collectionId;
+      itemInfo.title = item.collectionName;
+      itemInfo.extra = `${item.trackCount} tracks`;
+    }
+  } else if (item.wrapperType === 'artist') {
+    itemInfo.title = item.artistName;
+    itemKey = 'a' + item.artistId;
+    itemInfo.description = item.primaryGenreName.charAt(0).toUpperCase() + item.primaryGenreName.slice(1);
+    itemInfo.extra = '>'; // TODO: temp
+  }
+
+  return { itemKey, itemInfo };
+}
+
+export { searchSong, searchAlbum, searchArtist, searchAll, formatSearchItems }

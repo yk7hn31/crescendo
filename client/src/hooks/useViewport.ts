@@ -20,4 +20,4 @@ function useViewport() {
   return { width, isMobile, isTablet, isDesktop };
 }
 
-export default useViewport;
+export { useViewport };

@@ -1,19 +1,39 @@
-import React, { useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import FormActiveCtx from "@/store/FormActive";
+
+import { useSearchState } from "@/hooks/useSearch";
+import { searchAll, formatSearchItems } from "@/lib/search";
+
+import { itemListVariants } from "@/definitions/variants";
+import type { ItemDetails } from "@/definitions/types";
+
+import { SearchItem, SearchItemSkeleton } from './SearchItem';
 
 interface SearchItemListProps {
-  children: React.ReactNode;
   isMobile: boolean;
 }
 
-const itemListVariants = {
-  visible: { y: 0, opacity: 1, transition: {delay: 0.2} },
-  hidden: { y: 30, opacity: 0 }
-}
+const SearchItemList: React.FC<SearchItemListProps> = ({ isMobile }) => {
+  const { isFormActive, searchTerm } = useSearchState();
+  const [debouncedSTerm, setDebouncedSTerm] = useState<string>(searchTerm);
+  const [results, setResults] = useState<ItemDetails[]>([]);
 
-const SearchItemList: React.FC<SearchItemListProps> = ({ children, isMobile }) => {
-  const { isFormActive } = useContext(FormActiveCtx);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSTerm(searchTerm), 300);
+    return () => {
+      clearTimeout(handler);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    (async () => {
+      if (debouncedSTerm) {
+        setResults(await searchAll(debouncedSTerm));
+      } else {
+        setResults([]);
+      }
+    })();
+  }, [debouncedSTerm]);
 
   return (
     <motion.div
@@ -23,7 +43,13 @@ const SearchItemList: React.FC<SearchItemListProps> = ({ children, isMobile }) =
       animate={isFormActive ? 'visible' : 'hidden'}
       exit='hidden'
     >
-      {children}
+      {results.length ? results.map((result: ItemDetails) => {
+        const { itemKey, itemInfo } = formatSearchItems(result); 
+
+        return (
+          <SearchItem key={itemKey} {...itemInfo} />
+        );
+      }) : <><SearchItemSkeleton /><SearchItemSkeleton /><SearchItemSkeleton /></>}
     </motion.div>
   );
 }
