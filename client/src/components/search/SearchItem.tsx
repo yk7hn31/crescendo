@@ -1,17 +1,17 @@
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, MicVocal } from 'lucide-react';
-import type { SearchType } from '@/types/types';
 
 interface SearchItemProps {
   title: string;
   description: string;
   extra: string;
-  type: SearchType;
+  type: string;
   coverImg: string;
 }
 
 const SearchItem: React.FC<SearchItemProps> = ({ title, description, extra, type, coverImg }) => {
+  type = type !== 'artist' ? type === 'track' ? 'song' : 'album' : 'artist';
   return (
     <div className='flex items-center space-x-4 px-5 p-4 w-full h-20 border cursor-pointer transition hover:bg-gray-100 group first:rounded-t-lg last:rounded-b-lg'>
       <div className={`w-12 h-12 overflow-hidden ${type === 'artist' && 'rounded-full bg-slate-200 flex items-center justify-center'}`}>
@@ -30,7 +30,7 @@ const SearchItem: React.FC<SearchItemProps> = ({ title, description, extra, type
           <span>{description}</span>
         </p>
       </div>
-      <p className='text-gray-600 font-mono !ml-auto'>{extra}</p>
+      <p className='text-gray-600 font-mono text-sm !ml-auto'>{extra}</p>
     </div>
   );
 }

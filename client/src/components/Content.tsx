@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import FormActiveCtx from "@/store/FormActive";
 import useViewport from "@/hooks/useViewport";
 import { searchAll } from "@/lib/search";
-import type { SongInfo, AlbumInfo, ParamsType, ArtistInfo } from "@/types/types";
+import type { ParamsType, ItemDetails } from "@/types/types";
 import { SearchForm, SearchButton } from './search/SearchActions';
 import SearchItemList from "./search/SearchItemList";
 import { SearchItem, SearchItemSkeleton } from "./search/SearchItem";
@@ -12,7 +12,7 @@ import { SearchItem, SearchItemSkeleton } from "./search/SearchItem";
 const divVariants = {
   initial: { top: '40vh' },
   focused: { top: 0 }
-}
+};
 
 const springTransition2 = {
   type: "spring",
@@ -25,7 +25,7 @@ const Content: React.FC = () => {
   const { isMobile } = useViewport();
   const { isFormActive } = useContext(FormActiveCtx);
   const [params, setParams] = useState<ParamsType>({query:'',debouncedQuery:'',type:'all'});
-  const [results, setResults] = useState<(SongInfo | AlbumInfo | ArtistInfo)[]>([]);
+  const [results, setResults] = useState<ItemDetails[]>([]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -67,31 +67,31 @@ const Content: React.FC = () => {
         />}
         {isFormActive && 
         <SearchItemList key='search-item-list' isMobile={isMobile}>
-          {results.length ? results.map((result: SongInfo | AlbumInfo | ArtistInfo) => {
-            const itemInfo = {
-              key: '', title: '', description: '', extra: '', coverImg: ''
-            };
+          {results.length ? results.map((result: ItemDetails) => {
+            const itemInfo = { key: '', title: '', description: '', extra: '', coverImg: '' };
 
-            if (result.type === 'song' || result.type === 'album') {
-              itemInfo.title = result.title;
-              itemInfo.coverImg = result.artwork;
-              if (result.type === 'song') {
-                const minutes = Math.floor(result.trackLength / 60000);
-                const seconds = Math.floor((result.trackLength % 60000) / 1000);
-                itemInfo.extra = minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+            if (result.wrapperType === 'track' || result.wrapperType === 'collection') {
+              itemInfo.coverImg = result.artworkUrl100;
+              itemInfo.description = result.artistName;
+              if (result.wrapperType === 'track') {
+                const minutes = Math.floor(result.trackTimeMillis / 60000);
+                const seconds = Math.floor((result.trackTimeMillis % 60000) / 1000);
+                itemInfo.title = result.trackName
                 itemInfo.key = 't' + result.trackId;
-              } else if (result.type === 'album') {
-                itemInfo.extra = `${result.trackCount} tracks`
+                itemInfo.extra = minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+              } else if (result.wrapperType === 'collection') {
+                itemInfo.title = result.collectionName;
                 itemInfo.key = 'c' + result.collectionId;
+                itemInfo.extra = `${result.trackCount} tracks`;
               }
-            } else if (result.type === 'artist') {
-              itemInfo.title = result.name;
+            } else if (result.wrapperType === 'artist') {
+              itemInfo.title = result.artistName;
               itemInfo.key = 'a' + result.artistId;
-              itemInfo.description = result.genre.charAt(0).toUpperCase() + result.genre.slice(1);
+              itemInfo.description = result.primaryGenreName.charAt(0).toUpperCase() + result.primaryGenreName.slice(1);
               itemInfo.extra = '>'; // TODO: temp
             }
             return (
-              <SearchItem type={result.type} {...itemInfo} />
+              <SearchItem type={result.wrapperType} {...itemInfo} />
             );
           }) : <><SearchItemSkeleton /><SearchItemSkeleton /><SearchItemSkeleton /></>}
         </SearchItemList>}
