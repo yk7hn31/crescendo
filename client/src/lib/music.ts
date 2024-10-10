@@ -11,9 +11,18 @@ interface AlbumSearchOptions {
   artworkSize?: number;
 }
 
+async function lookup(id: string) {
+  const searchURI = `http://localhost:8080/lookup?id=${id}`;
+  const response = await fetch(searchURI);
+  const lookupData = await response.json();
+
+  if (!lookupData.resultCount) throw new Error(`no result for: ${id}`);
+  return lookupData.results;
+}
+
 async function getSearchResult(term: string, type: SearchEntity) {
-  const searchURI: string = `http://localhost:8080/search?term=${encodeURIComponent(term)}&entity=${type}`;
-  const response = await fetch(searchURI, { redirect: 'manual' });
+  const searchURI = `http://localhost:8080/search?term=${encodeURIComponent(term)}&entity=${type}`;
+  const response = await fetch(searchURI);
   const searchData = await response.json();
   
   if (!searchData.resultCount) throw new Error(`no result for: ${term}`);
@@ -85,4 +94,11 @@ function formatSearchItems(item: ItemDetails) {
   return { itemKey, itemInfo };
 }
 
-export { searchSong, searchAlbum, searchArtist, searchAll, formatSearchItems }
+const search = {
+  all: searchAll,
+  song: searchSong,
+  album: searchAlbum,
+  artist: searchArtist
+};
+
+export { search, lookup, formatSearchItems };

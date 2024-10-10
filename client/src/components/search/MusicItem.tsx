@@ -2,20 +2,25 @@ import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, MicVocal, ChevronRight } from 'lucide-react';
 
-interface SearchItemProps {
+interface MusicItemProps {
   title: string;
   description: string;
   extra: string; // FIXME: load more info from backend
   type: string;
   coverImg: string;
+  onClick: () => void;
 }
 
-const SearchItem: React.FC<SearchItemProps> = ({ title, description, extra, type, coverImg }) => {
+const MusicItem: React.FC<MusicItemProps> = ({ title, description, extra, type, coverImg, onClick }) => {
   type = type !== 'artist' ? type === 'track' ? 'song' : 'album' : 'artist';
+
   return (
-    <div className='flex items-center space-x-4 p-3 pl-4 w-full h-20 border cursor-pointer transition hover:bg-gray-100 group first:rounded-t-lg last:rounded-b-lg'>
+    <div 
+      className='flex items-center space-x-4 p-3 pl-4 w-full h-20 border cursor-pointer transition hover:bg-gray-100 group first:rounded-t-lg last:rounded-b-lg'
+      onClick={onClick}
+    >
       <div className={`w-12 h-12 overflow-hidden ${type === 'artist' && 'rounded-full bg-slate-200 flex items-center justify-center'}`}>
-        <div className='absolute flex items-center justify-center w-12 h-12 rounded bg-gray-500 bg-opacity-30 backdrop-blur-sm group-hover:opacity-100 opacity-0 transition'>
+        <div className={`absolute flex items-center justify-center w-12 h-12 ${type === 'artist' ? 'rounded-full' : 'rounded'} bg-gray-500 bg-opacity-30 backdrop-blur-sm group-hover:opacity-100 opacity-0 transition`}>
           <Plus className='text-white' />
         </div>
         {type === 'artist' ? 
@@ -39,7 +44,7 @@ const SearchItem: React.FC<SearchItemProps> = ({ title, description, extra, type
   );
 }
 
-const SearchItemSkeleton: React.FC = () => {
+const MusicItemSkeleton: React.FC = () => {
   return (
     <div className='flex items center justify-center space-x-4 px-5 p-4 w-full h-20'>
       <Skeleton className='w-12 h-12 rounded' />
@@ -51,4 +56,4 @@ const SearchItemSkeleton: React.FC = () => {
   );
 }
 
-export { SearchItem, SearchItemSkeleton };
+export { MusicItem, MusicItemSkeleton };

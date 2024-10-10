@@ -1,20 +1,38 @@
-import React from "react";
+import React, { useReducer } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useViewport } from "@/hooks/useViewport";
-import { useSearchState } from "@/hooks/useSearch";
+import { useSParamState } from "@/hooks/useSParam";
+import useDebouncedFetch from "@/hooks/useDebouncedFetch";
 
+import type { PanelState, PanelAction } from "@/definitions/types";
 import { contentDivVariants, springTransition } from "@/definitions/variants";
 
+import DetailsPanel from "./DetailsPanel";
 import SearchOpenButton from "./search/SearchOpenButton";
 import SearchForm from "./search/SearchForm";
-import SearchItemList from "./search/SearchItemList";
+import MusicItemList from "./search/MusicItemList";
+
+const panelReducer = (state: PanelState, action: PanelAction): PanelState => {
+  switch (action.type) {
+    case 'SET_PANEL_OPEN':
+      return { ...state, isPanelOpen: action.payload };
+    case 'SET_PANEL_ITEM_KEY':
+      return { ...state, panelItemKey: action.payload };
+    case 'SET_PANEL_BOTH':
+      return { ...action.payload }
+  }
+}
 
 const Content: React.FC = () => {
   const { isMobile } = useViewport();
-  const { isFormActive } = useSearchState();
+  const { isFormActive, searchTerm, entityType } = useSParamState();
+  const [panelState, panelDispatch] = useReducer(panelReducer, { isPanelOpen: false, panelItemKey: '' });
+  const items = useDebouncedFetch(searchTerm, entityType);
 
-  return (<>
+  return (
+  <>
+    <DetailsPanel isMobile={isMobile} panelState={panelState} panelDispatch={panelDispatch} />
     <AnimatePresence initial={false}>
       {(isMobile && !isFormActive) &&
       <SearchOpenButton key='search-button' />}
@@ -30,10 +48,20 @@ const Content: React.FC = () => {
         {(isFormActive || !isMobile) && 
         <SearchForm key='search-form' isMobile={isMobile} />}
         {isFormActive && 
-        <SearchItemList key='search-item-list' isMobile={isMobile} />}
+        <MusicItemList 
+          key='search-item-list'
+          className={isMobile ? 'w-full' : 'w-7/12'}
+          panelDispatch={panelDispatch}
+          animate={{
+            initial: 'hidden', animate: isFormActive ? 'visible' : 'hidden', exit: 'hidden'
+          }}
+        >
+          {items}
+        </MusicItemList>}
       </AnimatePresence>
     </motion.div>
-  </>);
+  </>
+  );
 }
 
 export default Content;

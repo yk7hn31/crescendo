@@ -1,16 +1,17 @@
 import React from 'react';
+
+import { SParamProvider } from './store/SParam';
 import Content from '@/components/Content';
 import Header from '@/components/Header';
-import { SearchProvider } from './store/Search';
 
 const App: React.FC = () => {
   return (
-    <SearchProvider>
+    <SParamProvider>
       <div className="h-screen overflow-hidden">
         <Header />
         <Content />
       </div>
-    </SearchProvider>
+    </SParamProvider>
   );
 };
 

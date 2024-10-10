@@ -10,7 +10,7 @@ Crescendo is a web app designed to streamline music discovery through a simple s
 
 ## Technologies
 
-- **Frontend**: React, TypeScript
+- **Frontend**: React(w/shadcn-UI), TypeScript
 - **Backend**: Go (API server)
 - **API**: iTunes Search API integration
 

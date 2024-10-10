@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-import { useSearchState } from '@/hooks/useSearch';
-import { useSearchDispatch } from '@/hooks/useSearch';
+import { useSParamState, useSParamDispatch } from '@/hooks/useSParam';
 
 import type { SearchEntity } from '@/definitions/types';
 import { formSelectVariants, springTransition } from '@/definitions/variants';
@@ -10,8 +9,8 @@ import { formSelectVariants, springTransition } from '@/definitions/variants';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const SearchEntitySelect: React.FC = () => {
-  const { isFormActive, entityType } = useSearchState();
-  const dispatch = useSearchDispatch();
+  const { isFormActive, entityType } = useSParamState();
+  const dispatch = useSParamDispatch();
 
   const handleEntityTypeChange = (type: SearchEntity) => {
     if (type) dispatch({ type: 'SET_ENTITY_TYPE', payload: type });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-import { useSearchDispatch } from '@/hooks/useSearch';
+import { useSParamDispatch } from '@/hooks/useSParam';
 
 import { buttonVariants, springTransition } from '@/definitions/variants';
 
@@ -10,7 +10,7 @@ import { Search } from 'lucide-react';
 
 
 const SearchOpenButton: React.FC = () => {
-  const dispatch = useSearchDispatch();
+  const dispatch = useSParamDispatch();
 
   const handleButtonClick = () => {
     dispatch({type: 'SET_FORM_ACTIVE', payload: true});

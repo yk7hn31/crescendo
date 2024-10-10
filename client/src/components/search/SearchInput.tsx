@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Search, X } from "lucide-react";
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { useSearchDispatch, useSearchState } from '@/hooks/useSearch';
+import { useSParamState, useSParamDispatch } from '@/hooks/useSParam';
 
 import { blurButtonVariants } from '@/definitions/variants';
 
@@ -11,8 +11,8 @@ interface SearchInputProps {
 }
 
 const SearchInput: React.FC<SearchInputProps> = ({ isMobile }) => {
-  const { isFormActive, searchTerm } = useSearchState();
-  const dispatch = useSearchDispatch();
+  const { isFormActive, searchTerm } = useSParamState();
+  const dispatch = useSParamDispatch();
   const input = useRef<HTMLInputElement>(null);
 
   const handleTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {

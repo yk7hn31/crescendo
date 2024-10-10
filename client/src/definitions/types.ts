@@ -35,13 +35,23 @@ export interface ArtistDetails {
   artistId: number;
 }
 
-export type SearchState = {
+export type SParamState = {
   isFormActive: boolean;
   searchTerm: string;
   entityType: SearchEntity;
 }
 
-export type SearchAction =
+export type SParamAction =
   | { type: 'SET_FORM_ACTIVE', payload: boolean }
   | { type: 'SET_SEARCH_TERM', payload: string }
   | { type: 'SET_ENTITY_TYPE', payload: SearchEntity }
+
+export type PanelState = {
+  isPanelOpen: boolean;
+  panelItemKey: string;
+}
+
+export type PanelAction =
+  | { type: 'SET_PANEL_OPEN', payload: boolean }
+  | { type: 'SET_PANEL_ITEM_KEY', payload: string }
+  | { type: 'SET_PANEL_BOTH', payload: PanelState }
