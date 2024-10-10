@@ -1,12 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-import { useSearchState } from "@/hooks/useSParam";
+import { useSParamState } from "@/hooks/useSParam";
 
 import { headerVariants, springTransition } from "@/definitions/variants";
 
 const Header: React.FC = () => {
-  const { isFormActive } = useSearchState();
+  const { isFormActive } = useSParamState();
 
   return (
     <motion.div

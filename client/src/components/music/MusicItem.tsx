@@ -1,31 +1,30 @@
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, MicVocal, ChevronRight } from 'lucide-react';
+import { MicVocal, ChevronRight } from 'lucide-react';
 
 interface MusicItemProps {
   title: string;
   description: string;
-  extra: string; // FIXME: load more info from backend
   type: string;
-  coverImg: string;
+  coverImg?: string;
+  trackNumber?: number;
   onClick: () => void;
 }
 
-const MusicItem: React.FC<MusicItemProps> = ({ title, description, extra, type, coverImg, onClick }) => {
+const MusicItem: React.FC<MusicItemProps>
+ = ({ title, description, type, coverImg, trackNumber, onClick }) => {
   type = type !== 'artist' ? type === 'track' ? 'song' : 'album' : 'artist';
 
   return (
     <div 
-      className='flex items-center space-x-4 p-3 pl-4 w-full h-20 border cursor-pointer transition hover:bg-gray-100 group first:rounded-t-lg last:rounded-b-lg'
+      className='flex items-center space-x-4 p-3 pl-4 w-full h-20 border-y cursor-pointer transition hover:bg-gray-100 group first:border-t-0 last:border-b-0'
       onClick={onClick}
     >
-      <div className={`w-12 h-12 overflow-hidden ${type === 'artist' && 'rounded-full bg-slate-200 flex items-center justify-center'}`}>
-        <div className={`absolute flex items-center justify-center w-12 h-12 ${type === 'artist' ? 'rounded-full' : 'rounded'} bg-gray-500 bg-opacity-30 backdrop-blur-sm group-hover:opacity-100 opacity-0 transition`}>
-          <Plus className='text-white' />
-        </div>
+      <div className={`flex items-center justify-center ${trackNumber ? 'w-6' : 'w-12'} h-12 overflow-hidden ${type === 'artist' && 'rounded-full bg-slate-200'}`}>
         {type === 'artist' ? 
         <MicVocal className='w-6 h-6 text-gray-700' />
-        : <img src={coverImg} alt='cover' className='rounded h-12' />}
+        : trackNumber ? <div className='font-mono'>{trackNumber}</div> :
+        <img src={coverImg} alt='cover' className='rounded h-12' />}
       </div>
 
       <div className='flex flex-col justify-center flex-1 min-w-0 pr-4'>
@@ -37,8 +36,8 @@ const MusicItem: React.FC<MusicItemProps> = ({ title, description, extra, type, 
         </p>
       </div>
 
-      <p className='text-gray-600 font-mono text-sm !ml-auto'>
-        {type !== 'song' ? <ChevronRight /> : extra}
+      <p className='text-gray-600 text-sm !ml-auto'>
+        <ChevronRight />
       </p>
     </div>
   );

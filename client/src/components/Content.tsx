@@ -8,10 +8,10 @@ import useDebouncedFetch from "@/hooks/useDebouncedFetch";
 import type { PanelState, PanelAction } from "@/definitions/types";
 import { contentDivVariants, springTransition } from "@/definitions/variants";
 
-import DetailsPanel from "./DetailsPanel";
+import DetailsPanel from "./music/DetailsPanel";
 import SearchOpenButton from "./search/SearchOpenButton";
 import SearchForm from "./search/SearchForm";
-import MusicItemList from "./search/MusicItemList";
+import MusicItemList from "./music/MusicItemList";
 
 const panelReducer = (state: PanelState, action: PanelAction): PanelState => {
   switch (action.type) {
@@ -50,7 +50,7 @@ const Content: React.FC = () => {
         {isFormActive && 
         <MusicItemList 
           key='search-item-list'
-          className={isMobile ? 'w-full' : 'w-7/12'}
+          className={`rounded-lg ${isMobile ? 'w-full' : 'w-7/12'} ${items.length && 'border'}`}
           panelDispatch={panelDispatch}
           animate={{
             initial: 'hidden', animate: isFormActive ? 'visible' : 'hidden', exit: 'hidden'

@@ -16,13 +16,13 @@ interface MusicItemListProps {
     initial: string;
     animate: string;
     exit: string;
-  }
+  };
+  inclTrackNo?: boolean;
 }
 
-const MusicItemList: React.FC<MusicItemListProps> = 
-({ children, className, panelDispatch, animate }) => {
+const MusicItemList: React.FC<MusicItemListProps> = ({ children, className, panelDispatch, animate, inclTrackNo }) => {
   const items = children.length ? children.map((item: ItemDetails) => {
-    const { itemKey, itemInfo } = formatSearchItems(item);
+    const { itemKey, itemInfo } = formatSearchItems(item, inclTrackNo);
     const handleItemClick = () => {
       panelDispatch({ type: 'SET_PANEL_BOTH',
         payload: { isPanelOpen: true, panelItemKey: itemKey }

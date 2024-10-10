@@ -11,8 +11,23 @@ interface AlbumSearchOptions {
   artworkSize?: number;
 }
 
-async function lookup(id: string) {
-  const searchURI = `http://localhost:8080/lookup?id=${id}`;
+interface SearchItemDetails {
+  type: string;
+  title: string;
+  description: string;
+  coverImg?: string;
+  trackNumber?: number;
+};
+
+interface PanelItemDetails {
+  title?: string;
+  type?: 'Song' | 'Album' | 'Artist';
+  extra?: (string | number)[];
+  coverImg?: string;
+};
+
+async function lookup(id: string, limit?: number) {
+  const searchURI = `http://localhost:8080/lookup?id=${id}&limit=${limit ?? ''}`;
   const response = await fetch(searchURI);
   const lookupData = await response.json();
 
@@ -66,33 +81,59 @@ async function searchAll(term: string) {
   return await getSearchResult(term, 'all');
 }
 
-function formatSearchItems(item: ItemDetails) {
+function formatSearchItems(item: ItemDetails, inclTrackNo?: boolean) {
   let itemKey: string = '';
-  const itemInfo = { type: item.wrapperType, title: '', description: '', extra: '', coverImg: '' };
+  const itemInfo: SearchItemDetails = {
+    type: item.wrapperType, title: '', description: ''
+  };
 
   if (item.wrapperType === 'track' || item.wrapperType === 'collection') {
-    itemInfo.coverImg = item.artworkUrl100;
+    if (inclTrackNo && item.wrapperType === 'track') itemInfo.trackNumber = item.trackNumber; 
+    else itemInfo.coverImg = item.artworkUrl100;
+
     itemInfo.description = item.artistName;
+
     if (item.wrapperType === 'track') {
-      const minutes = Math.floor(item.trackTimeMillis / 60000);
-      const seconds = Math.floor((item.trackTimeMillis % 60000) / 1000);
       itemKey = 't' + item.trackId;
-      itemInfo.title = item.trackName
-      itemInfo.extra = minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+      itemInfo.title = item.trackName;
     } else if (item.wrapperType === 'collection') {
       itemKey = 'c' + item.collectionId;
       itemInfo.title = item.collectionName;
-      itemInfo.extra = `${item.trackCount} tracks`;
     }
   } else if (item.wrapperType === 'artist') {
-    itemInfo.title = item.artistName;
     itemKey = 'a' + item.artistId;
+    itemInfo.title = item.artistName;
     itemInfo.description = item.primaryGenreName.charAt(0).toUpperCase() + item.primaryGenreName.slice(1);
-    itemInfo.extra = '>'; // TODO: temp
   }
 
   return { itemKey, itemInfo };
 }
+
+function formatPanelItemInfo(content: ItemDetails[]) {
+  const panelItemInfo: PanelItemDetails = {};
+
+  if (content.length) {
+    if (content[0]?.wrapperType === 'artist') {
+      panelItemInfo.title = content[0].artistName;
+      panelItemInfo.type = 'Artist';
+    } else {
+      panelItemInfo.coverImg = content[0].artworkUrl100;
+      if (content[0]?.wrapperType === 'collection') {
+        const year = new Date(content[0].releaseDate).getFullYear();
+        panelItemInfo.title = content[0].collectionName;
+        panelItemInfo.type = 'Album';
+        panelItemInfo.extra = [content[0].artistName, year];
+      } else if (content[0]?.wrapperType === 'track') {
+        panelItemInfo.title = content[0].trackName;
+        panelItemInfo.type = 'Song';
+        panelItemInfo.extra = [content[0].artistName, content[0].collectionName];
+      }
+    }
+    return panelItemInfo;
+  } else {
+    return;
+  }
+};
 
 const search = {
   all: searchAll,
@@ -101,4 +142,4 @@ const search = {
   artist: searchArtist
 };
 
-export { search, lookup, formatSearchItems };
+export { search, lookup, formatSearchItems, formatPanelItemInfo };
