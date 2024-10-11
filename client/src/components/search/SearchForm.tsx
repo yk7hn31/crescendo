@@ -7,14 +7,15 @@ import SearchInput from './SearchInput';
 import SearchEntitySelect from './SearchEntitySelect';
 
 interface SearchFormProps {
+  className?: string;
   isMobile: boolean;
 }
 
-const SearchForm: React.FC<SearchFormProps> = ({ isMobile }) => {
+const SearchForm: React.FC<SearchFormProps> = ({ isMobile, className }) => {
   return (
     <motion.form
       onSubmit={e => e.preventDefault()}
-      className={`flex flex-col gap-y-2 ${isMobile ? 'w-full' : 'w-1/2'} max-w-[530px] min-w-[330px]`}
+      className={`flex flex-col gap-y-2 bg-white ${className}`}
       variants={formVariants}
       initial={false}
       animate='visible'

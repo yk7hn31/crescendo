@@ -24,7 +24,6 @@ const DetailsPanel: React.FC<DetailsPanelProps> = ({ isMobile, panelState, panel
 
   useEffect(() => {
     if (panelItemKey) {
-      setContent([]);
       lookup(panelItemKey, panelItemKey[0] === 'a' ? 10 : undefined)
       .then(setContent);
     }
@@ -33,12 +32,13 @@ const DetailsPanel: React.FC<DetailsPanelProps> = ({ isMobile, panelState, panel
 
   if (panelItemInfo) {
     const headerContent = (<>
-      {panelItemInfo.type === 'Artist' ? 
-      <div className='flex justify-center items-center rounded-full h-full aspect-square bg-slate-200'>
-        <MicVocal />
-      </div> :
-      <img src={panelItemInfo.coverImg} alt='cover' className='rounded h-full' />}
-      <div className='flex flex-col justify-center text-left'>
+      <div className={`flex justify-center items-center h-full aspect-square ${panelItemInfo.type === 'Artist' && 'rounded-full bg-slate-200'}`}>
+        {panelItemInfo.type === 'Artist' ? 
+        <MicVocal /> :
+        <img src={panelItemInfo.coverImg} alt='cover' className='rounded h-full border' />}
+      </div>
+
+      <div className='flex flex-col justify-center text-left overflow-hidden'>
         <h1 className='font-bold text-xl'>
           {panelItemInfo.title} {/* demo for collections(albums) */}
         </h1>
@@ -61,7 +61,8 @@ const DetailsPanel: React.FC<DetailsPanelProps> = ({ isMobile, panelState, panel
       <MusicItemList
        className='w-full'
        panelDispatch={panelDispatch}
-       inclTrackNo={panelItemInfo.type === 'Album'}
+       displayTrackNo={panelItemInfo.type === 'Album'}
+       displayDuration
       >
         {content.slice(1)}
       </MusicItemList>
@@ -78,13 +79,13 @@ const DetailsPanel: React.FC<DetailsPanelProps> = ({ isMobile, panelState, panel
       return (
         <Drawer open={isPanelOpen} onClose={handleClose}>
           <DrawerContent>
-            <DrawerHeader className='flex m-4 h-24 rounded-lg space-x-3 bg-gray-100'>
-              <DrawerTitle className='hidden' />
-              <DrawerDescription className='hidden' />
+            <DrawerTitle className='hidden' />
+            <DrawerDescription className='hidden' />
+            <DrawerHeader className='flex m-4 h-24 rounded-lg space-x-3 bg-gray-100'>  
               {headerContent}
             </DrawerHeader>
 
-            <ScrollArea className='max-h-[60vh] mx-3 border rounded-lg'>
+            <ScrollArea className='max-h-[55vh] mx-3 border rounded-lg'>
               {musicItemList}
             </ScrollArea>
 
@@ -97,9 +98,9 @@ const DetailsPanel: React.FC<DetailsPanelProps> = ({ isMobile, panelState, panel
       return (
         <Dialog open={isPanelOpen} onOpenChange={handleOpenChange}>
           <DialogContent>
-            <DialogHeader className='flex flex-row p-4 h-20 rounded-lg space-x-3 bg-gray-100'>
-              <DialogTitle className='hidden' />
-              <DialogDescription className='hidden' />
+            <DialogTitle className='hidden' />
+            <DialogDescription className='hidden' />
+            <DialogHeader className='flex flex-row p-4 h-20 rounded-lg space-y-0 space-x-4 bg-gray-100'>
               {headerContent}
             </DialogHeader>
 

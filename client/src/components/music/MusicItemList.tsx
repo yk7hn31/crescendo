@@ -10,19 +10,21 @@ import { MusicItem, MusicItemSkeleton } from './MusicItem';
 
 interface MusicItemListProps {
   children: ItemDetails[];
-  className: string;
+  className?: string | number;
   panelDispatch: React.Dispatch<PanelAction>;
   animate?: {
     initial: string;
     animate: string;
     exit: string;
   };
-  inclTrackNo?: boolean;
+  displayTrackNo?: boolean;
+  displayDuration?: boolean;
 }
 
-const MusicItemList: React.FC<MusicItemListProps> = ({ children, className, panelDispatch, animate, inclTrackNo }) => {
+const MusicItemList: React.FC<MusicItemListProps>
+ = ({ children, className, panelDispatch, animate, ...options }) => {
   const items = children.length ? children.map((item: ItemDetails) => {
-    const { itemKey, itemInfo } = formatSearchItems(item, inclTrackNo);
+    const { itemKey, itemInfo } = formatSearchItems(item, options);
     const handleItemClick = () => {
       panelDispatch({ type: 'SET_PANEL_BOTH',
         payload: { isPanelOpen: true, panelItemKey: itemKey }

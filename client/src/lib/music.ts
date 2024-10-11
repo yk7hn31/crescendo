@@ -11,12 +11,18 @@ interface AlbumSearchOptions {
   artworkSize?: number;
 }
 
+interface FormatterOptions {
+  displayTrackNo?: boolean;
+  displayDuration?: boolean;
+}
+
 interface SearchItemDetails {
   type: string;
   title: string;
   description: string;
   coverImg?: string;
   trackNumber?: number;
+  duration?: number;
 };
 
 interface PanelItemDetails {
@@ -27,12 +33,12 @@ interface PanelItemDetails {
 };
 
 async function lookup(id: string, limit?: number) {
-  const searchURI = `http://localhost:8080/lookup?id=${id}&limit=${limit ?? ''}`;
+  const searchURI = `http://localhost:8080/lookup?id=${id}`;
   const response = await fetch(searchURI);
   const lookupData = await response.json();
 
   if (!lookupData.resultCount) throw new Error(`no result for: ${id}`);
-  return lookupData.results;
+  return limit ? lookupData.results.slice(0, limit - 1) : lookupData.results;
 }
 
 async function getSearchResult(term: string, type: SearchEntity) {
@@ -81,19 +87,20 @@ async function searchAll(term: string) {
   return await getSearchResult(term, 'all');
 }
 
-function formatSearchItems(item: ItemDetails, inclTrackNo?: boolean) {
+function formatSearchItems(item: ItemDetails, options?: FormatterOptions) {
   let itemKey: string = '';
   const itemInfo: SearchItemDetails = {
     type: item.wrapperType, title: '', description: ''
   };
 
   if (item.wrapperType === 'track' || item.wrapperType === 'collection') {
-    if (inclTrackNo && item.wrapperType === 'track') itemInfo.trackNumber = item.trackNumber; 
+    if (options?.displayTrackNo && item.wrapperType === 'track') itemInfo.trackNumber = item.trackNumber;
     else itemInfo.coverImg = item.artworkUrl100;
 
     itemInfo.description = item.artistName;
 
     if (item.wrapperType === 'track') {
+      if (options?.displayDuration) itemInfo.duration = item.trackTimeMillis;
       itemKey = 't' + item.trackId;
       itemInfo.title = item.trackName;
     } else if (item.wrapperType === 'collection') {

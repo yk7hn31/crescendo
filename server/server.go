@@ -66,7 +66,6 @@ func lookupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	limit := r.URL.Query().Get("limit")
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		http.Error(w, "Missing 'id' query parameter", http.StatusBadRequest)
@@ -76,7 +75,6 @@ func lookupHandler(w http.ResponseWriter, r *http.Request) {
 	baseURL := "https://itunes.apple.com/lookup"
 	params := url.Values{}
 	params.Add("id", id[1:])
-	params.Add("limit", limit)
 	params.Add("entity", "song")
 
 	handleRequest(w, baseURL, params)

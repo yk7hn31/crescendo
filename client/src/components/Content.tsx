@@ -38,26 +38,32 @@ const Content: React.FC = () => {
       <SearchOpenButton key='search-button' />}
     </AnimatePresence>
     <motion.div 
-      className={`absolute w-full flex flex-col items-center space-y-4 px-4 p-6 ${(!isMobile && !isFormActive) && 'translate-y-11'}`}
+      className={`absolute w-full flex flex-col items-center pb-6 ${(!isMobile && !isFormActive) && 'translate-y-11'}`}
       variants={contentDivVariants}
       initial='initial'
       animate={isFormActive ? 'focused' : 'initial'}
       transition={{...springTransition, delay: 0.075}}
     >
-      <AnimatePresence>
+      <AnimatePresence> {/*  max-w-[530px] min-w-[330px] */}
         {(isFormActive || !isMobile) && 
-        <SearchForm key='search-form' isMobile={isMobile} />}
+        <SearchForm
+          key='search-form'
+          className={`fixed p-4 ${isMobile ? 'w-full' : 'w-7/12'}`}
+          isMobile={isMobile}
+        />}
         {isFormActive && 
-        <MusicItemList 
-          key='search-item-list'
-          className={`rounded-lg ${isMobile ? 'w-full' : 'w-7/12'} ${items.length && 'border'}`}
-          panelDispatch={panelDispatch}
-          animate={{
-            initial: 'hidden', animate: isFormActive ? 'visible' : 'hidden', exit: 'hidden'
-          }}
-        >
-          {items}
-        </MusicItemList>}
+        <div className={`mt-32 mx-4 ${isMobile ? 'w-full px-3' : 'w-7/12'}`}>
+          <MusicItemList 
+            key='search-item-list'
+            className={`w-full overflow-hidden ${items.length && 'rounded-lg border'}`}
+            panelDispatch={panelDispatch}
+            animate={{
+              initial: 'hidden', animate: isFormActive ? 'visible' : 'hidden', exit: 'hidden'
+            }}
+          >
+            {items}
+          </MusicItemList>
+        </div>}
       </AnimatePresence>
     </motion.div>
   </>

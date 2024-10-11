@@ -32,7 +32,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ isMobile }) => {
   }, [isFormActive]);
 
   return (
-    <motion.div layout className='flex space-x-2 items-center'>
+    <motion.div layout className='flex items-center'>
       <motion.div layout className='relative grow'>
         <label htmlFor='query' className='sr-only'></label>
         <input type='text' name='query' id='query'
