@@ -14,6 +14,7 @@ import DetailsPanel from "./music/DetailsPanel";
 import SearchOpenButton from "./search/SearchOpenButton";
 import SearchForm from "./search/SearchForm";
 import MusicItemList from "./music/MusicItemList";
+import { Toaster } from "./ui/toaster";
 
 const panelReducer = (state: PanelState, action: PanelAction): PanelState => {
   switch (action.type) {
@@ -35,6 +36,7 @@ const Content: React.FC = () => {
 
   return (
   <>
+    <Toaster />
     <DetailsPanel
       isMobile={isMobile}
       panelState={panelState}

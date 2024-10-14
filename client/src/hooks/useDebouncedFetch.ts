@@ -26,7 +26,8 @@ function useDebouncedFetch(searchTerm: string, entityType: SearchEntity) {
     } else {
       setResults([]);
     }
-  }, [debouncedSTerm, entityType, errHandler]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSTerm, entityType]);
 
   return results;
 }

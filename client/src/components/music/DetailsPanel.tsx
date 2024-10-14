@@ -28,6 +28,8 @@ const DetailsPanel: React.FC<DetailsPanelProps>
     payload: { isPanelOpen: false, panelItemId: '' }
   });
   const Panel = isMobile ? MobileDetailsPanel : DesktopDetailsPanel;
+  let header: JSX.Element | undefined;
+  let footer: JSX.Element | undefined;
   const props = {
     open: isPanelOpen,
     onClose: closePanel,
@@ -37,7 +39,7 @@ const DetailsPanel: React.FC<DetailsPanelProps>
     content: (
       <PanelContent
         type={featured[0] && featured[0].type}
-        className={isMobile ? 'max-h-[55vh]' : 'max-h-96'}
+        className={isMobile ? 'max-h-[55vh] mx-3' : 'max-h-96'}
         panelDispatch={panelDispatch}
       >{featured}</PanelContent>
     )
@@ -46,19 +48,21 @@ const DetailsPanel: React.FC<DetailsPanelProps>
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     if (isPanelOpen && panelItemId) {
+      setFeatured([]);
       lookup(panelItemId, panelItemId[0] === 'a' ? 10 : undefined)
       .then(setFeatured)
       .catch(errHandler);
     }
     if (!isPanelOpen) timeout = setTimeout(() => setFeatured([]), 100);
     return () => clearTimeout(timeout);
-  }, [isPanelOpen, panelItemId, errHandler]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPanelOpen, panelItemId]);
 
   if (featured.length > 0) {
     const panelItem: ItemDetails = featured[0];
     const isFavorite = panelItemId in favorites[panelItem.type];
-    const header = <PanelHeader {...panelItem} />;
-    const footer = (
+    header = <PanelHeader {...panelItem} />;
+    footer = (
       <PanelFooter
         isFavorite={isFavorite}
         onClick={isFavorite ? () => favoritesDispatch({ type: 'REMOVE', payload: panelItemId })
@@ -66,14 +70,9 @@ const DetailsPanel: React.FC<DetailsPanelProps>
         }
       />
     );
-    return (
-      <Panel header={header} footer={footer} {...props} />
-    );
-  } else {
-    return (
-      <Panel {...props} />
-    );
   }
+
+  return <Panel header={header} footer={footer} {...props} />;
 }
 
 export default DetailsPanel;
