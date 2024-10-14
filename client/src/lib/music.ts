@@ -1,78 +1,62 @@
-import type { SearchEntity, SongDetails, AlbumDetails, ItemDetails } from '@/definitions/types';
-
-interface SongSearchOptions {
-  artist?: string;
-  album?: string;
-  artworkSize?: number;
-}
-
-interface AlbumSearchOptions {
-  artist?: string;
-  artworkSize?: number;
-}
-
-interface FormatterOptions {
-  displayTrackNo?: boolean;
-  displayDuration?: boolean;
-}
-
-interface SearchItemDetails {
-  type: string;
-  title: string;
-  description: string;
-  coverImg?: string;
-  trackNumber?: number;
-  duration?: number;
-};
-
-interface PanelItemDetails {
-  title?: string;
-  type?: 'Song' | 'Album' | 'Artist';
-  extra?: (string | number)[];
-  coverImg?: string;
-};
+import type { SearchEntity, ItemDetails } from '@/definitions/types';
+import { convertType } from './utils';
 
 async function lookup(id: string, limit?: number) {
   const searchURI = `http://localhost:8080/lookup?id=${id}`;
   const response = await fetch(searchURI);
-  const lookupData = await response.json();
+  if (!response.ok) throw new Error(`0: network error; status code: ${response.status}`);
+  let lookupData;
 
-  if (!lookupData.resultCount) throw new Error(`no result for: ${id}`);
-  return limit ? lookupData.results.slice(0, limit - 1) : lookupData.results;
+  try {
+    lookupData = await response.json();
+  } catch (jsonErr) {
+    throw new Error(`1: failed to parse JSON response: ${(jsonErr as Error).message}`);
+  }
+  if (!lookupData.resultCount) throw new Error(`2: no result for: ${id}`);
+
+  const results = lookupData.results.map(structSearchItems);
+  return limit ? results.slice(0, limit - 1) : results;
 }
 
 async function getSearchResult(term: string, type: SearchEntity) {
   const searchURI = `http://localhost:8080/search?term=${encodeURIComponent(term)}&entity=${type}`;
   const response = await fetch(searchURI);
-  const searchData = await response.json();
-  
-  if (!searchData.resultCount) throw new Error(`no result for: ${term}`);
-  return searchData.results;
+  if (!response.ok) throw new Error(`0: network error; status code: ${response.status}`);
+  let searchData;
+
+  try {
+    searchData = await response.json();
+  } catch (jsonErr) {
+    throw new Error(`1: failed to parse JSON response: ${(jsonErr as Error).message}`);
+  }
+  if (!searchData.resultCount) throw new Error(`2: no result for: ${term}`);
+
+  return searchData.results.map(structSearchItems);
 }
 
-async function searchSong(term: string, { artist, album }: SongSearchOptions = {}) {
-  let searchResult: SongDetails[] = await getSearchResult(term, 'song');
+async function searchSong(term: string, filter?: { artist?: string, album?: string }) {
+  let searchResult: ItemDetails[] = await getSearchResult(term, 'song');
 
-  if (album) {
-    searchResult = searchResult.filter(({ collectionName }) => 
-      collectionName.toLowerCase().includes(album.toLowerCase())
+  if (filter?.album) {
+    searchResult = searchResult.filter(({ data }) => 
+      data?.album?.toLowerCase().includes(filter.album!.toLowerCase())
     );
   }
-  if (artist) {
-    searchResult = searchResult.filter(({ artistName }) => 
-      artistName.toLowerCase().includes(artist.toLowerCase())
+  if (filter?.artist) {
+    searchResult = searchResult.filter(({ data }) => 
+      data?.artist?.toLowerCase().includes(filter.artist!.toLowerCase())
     );
   }
 
   return searchResult;
 }
 
-async function searchAlbum(term: string, { artist }: AlbumSearchOptions = {}) {
-  let searchResult: AlbumDetails[] = await getSearchResult(term, 'album');
+async function searchAlbum(term: string, filter?: { artist?: string }) {
+  let searchResult: ItemDetails[] = await getSearchResult(term, 'album');
 
-  if (artist) {
-    searchResult = searchResult.filter(({ artistName }) =>
-      artistName.toLowerCase().includes(artist.toLowerCase())
+  if (filter?.artist) {
+    searchResult = searchResult.filter(({ data }) =>
+      data?.artist?.toLowerCase().includes(filter.artist!.toLowerCase())
     );
   }
 
@@ -87,60 +71,37 @@ async function searchAll(term: string) {
   return await getSearchResult(term, 'all');
 }
 
-function formatSearchItems(item: ItemDetails, options?: FormatterOptions) {
-  let itemKey: string = '';
-  const itemInfo: SearchItemDetails = {
-    type: item.wrapperType, title: '', description: ''
+// @ts-expect-error passthrough for API's return value
+function structSearchItems(item): ItemDetails {
+  const result: ItemDetails = {
+    title: '', type: convertType(item.wrapperType),
+    genre: item.primaryGenreName, id: item.wrapperType[0]
   };
 
   if (item.wrapperType === 'track' || item.wrapperType === 'collection') {
-    if (options?.displayTrackNo && item.wrapperType === 'track') itemInfo.trackNumber = item.trackNumber;
-    else itemInfo.coverImg = item.artworkUrl100;
-
-    itemInfo.description = item.artistName;
-
+    result.data = {};
+    result.data.artist = item.artistName;
+    result.data.coverImg = item.artworkUrl100;
     if (item.wrapperType === 'track') {
-      if (options?.displayDuration) itemInfo.duration = item.trackTimeMillis;
-      itemKey = 't' + item.trackId;
-      itemInfo.title = item.trackName;
+      const minutes = Math.floor(item.trackTimeMillis / 60000);
+      const seconds = Math.floor((item.trackTimeMillis % 60000) / 1000);
+      result.data.duration = minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+      result.title = item.trackName;
+      result.id += item.trackId;
+      result.data.album = item.collectionName;
+      result.data.trackNumber = item.trackNumber;
     } else if (item.wrapperType === 'collection') {
-      itemKey = 'c' + item.collectionId;
-      itemInfo.title = item.collectionName;
+      result.title = item.collectionName;
+      result.id += item.collectionId;
+      result.data.releaseYear = new Date(item.releaseDate).getFullYear();
     }
   } else if (item.wrapperType === 'artist') {
-    itemKey = 'a' + item.artistId;
-    itemInfo.title = item.artistName;
-    itemInfo.description = item.primaryGenreName.charAt(0).toUpperCase() + item.primaryGenreName.slice(1);
+    result.title = item.artistName;
+    result.id += item.artistId;
   }
 
-  return { itemKey, itemInfo };
+  return result;
 }
-
-function formatPanelItemInfo(content: ItemDetails[]) {
-  const panelItemInfo: PanelItemDetails = {};
-
-  if (content.length) {
-    if (content[0]?.wrapperType === 'artist') {
-      panelItemInfo.title = content[0].artistName;
-      panelItemInfo.type = 'Artist';
-    } else {
-      panelItemInfo.coverImg = content[0].artworkUrl100;
-      if (content[0]?.wrapperType === 'collection') {
-        const year = new Date(content[0].releaseDate).getFullYear();
-        panelItemInfo.title = content[0].collectionName;
-        panelItemInfo.type = 'Album';
-        panelItemInfo.extra = [content[0].artistName, year];
-      } else if (content[0]?.wrapperType === 'track') {
-        panelItemInfo.title = content[0].trackName;
-        panelItemInfo.type = 'Song';
-        panelItemInfo.extra = [content[0].artistName, content[0].collectionName];
-      }
-    }
-    return panelItemInfo;
-  } else {
-    return;
-  }
-};
 
 const search = {
   all: searchAll,
@@ -149,4 +110,4 @@ const search = {
   artist: searchArtist
 };
 
-export { search, lookup, formatSearchItems, formatPanelItemInfo };
+export { search, lookup, structSearchItems };

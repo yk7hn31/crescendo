@@ -111,7 +111,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	params.Add("term", term)
 	params.Add("entity", entity)
 	params.Add("media", "music")
-	params.Add("limit", "10")
+	params.Add("limit", "30")
 
 	handleRequest(w, baseURL, params)
 }

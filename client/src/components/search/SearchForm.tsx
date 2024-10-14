@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+import { cn } from '@/lib/utils';
+
 import { formVariants, springTransition } from '@/definitions/variants';
 
 import SearchInput from './SearchInput';
@@ -15,7 +17,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ isMobile, className }) => {
   return (
     <motion.form
       onSubmit={e => e.preventDefault()}
-      className={`flex flex-col gap-y-2 bg-white ${className}`}
+      className={cn('flex flex-col gap-y-2 bg-white', className)}
       variants={formVariants}
       initial={false}
       animate='visible'

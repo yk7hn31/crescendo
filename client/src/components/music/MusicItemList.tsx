@@ -1,7 +1,5 @@
-import React from "react";
+import React, { type Dispatch } from "react";
 import { motion } from "framer-motion";
-
-import { formatSearchItems } from "@/lib/music";
 
 import { itemListVariants } from "@/definitions/variants";
 import type { ItemDetails, PanelAction } from "@/definitions/types";
@@ -11,7 +9,7 @@ import { MusicItem, MusicItemSkeleton } from './MusicItem';
 interface MusicItemListProps {
   children: ItemDetails[];
   className?: string | number;
-  panelDispatch: React.Dispatch<PanelAction>;
+  panelDispatch: Dispatch<PanelAction>;
   animate?: {
     initial: string;
     animate: string;
@@ -24,13 +22,14 @@ interface MusicItemListProps {
 const MusicItemList: React.FC<MusicItemListProps>
  = ({ children, className, panelDispatch, animate, ...options }) => {
   const items = children.length ? children.map((item: ItemDetails) => {
-    const { itemKey, itemInfo } = formatSearchItems(item, options);
     const handleItemClick = () => {
       panelDispatch({ type: 'SET_PANEL_BOTH',
-        payload: { isPanelOpen: true, panelItemKey: itemKey }
+        payload: { isPanelOpen: true, panelItemId: item.id }
       });
     }
-    return <MusicItem key={itemKey} onClick={handleItemClick} {...itemInfo} />
+    if (!options.displayDuration) delete item.data?.duration;
+    if (!options.displayTrackNo) delete item.data?.trackNumber;
+    return <MusicItem key={item.id} onClick={handleItemClick} {...item} />
   }) : <><MusicItemSkeleton /><MusicItemSkeleton /><MusicItemSkeleton /></>
 
   if (animate) {

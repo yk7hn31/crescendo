@@ -1,39 +1,30 @@
-export type SearchEntity = 'song' | 'album' | 'artist' | 'all';
+export type ItemType = 'song' | 'album' | 'artist';
+export type SearchEntity = ItemType | 'all';
 
-export type ItemDetails = SongDetails | AlbumDetails | ArtistDetails;
-
-export interface MediaDetails {
-  artistName: string;
-  collectionName: string;
-  primaryGenreName: string;
-  artworkUrl100: string;
+export interface ItemDetails {
+  title: string;
+  type: ItemType;
+  id: string;
+  genre: string;
+  data?: Partial<{
+    album: string;
+    coverImg: string;
+    duration: string;
+    trackNumber: number;
+    artist: string;
+    releaseYear: number;
+  }>;
 }
 
-export interface SongDetails extends MediaDetails {
-  wrapperType: 'track';
-  trackName: string;
-  trackNumber: number;
-  trackTimeMillis: number;
-  trackExplicitness: string;
-  isStreamable: boolean;
-  trackId: number;
+export interface Favorites {
+  song: { [key: string]: ItemDetails; };
+  album: { [key: string]: ItemDetails; };
+  artist: { [key: string]: ItemDetails; };
 }
 
-export interface AlbumDetails extends MediaDetails {
-  wrapperType: 'collection';
-  trackCount: number;
-  releaseDate: number;
-  collectionId: number;
-  collectionExplicitness: string;
-}
-
-export interface ArtistDetails {
-  wrapperType: 'artist';
-  artistName: string;
-  primaryGenreName: string;
-  artistLinkUrl: string;
-  artistId: number;
-}
+export type FavoritesAction =
+  | { type: 'ADD', payload: ItemDetails }
+  | { type: 'REMOVE', payload: string } // a[xxx] c[xxx] t[xxx]
 
 export type SParamState = {
   isFormActive: boolean;
@@ -48,7 +39,7 @@ export type SParamAction =
 
 export type PanelState = {
   isPanelOpen: boolean;
-  panelItemKey: string;
+  panelItemId: string;
 }
 
 export type PanelAction =

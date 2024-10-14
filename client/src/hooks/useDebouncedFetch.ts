@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+import useErrorHandler from "./useErrorHandler";
 import { search } from "@/lib/music";
 
 import { ItemDetails, SearchEntity } from "@/definitions/types";
@@ -7,6 +8,7 @@ import { ItemDetails, SearchEntity } from "@/definitions/types";
 function useDebouncedFetch(searchTerm: string, entityType: SearchEntity) {
   const [debouncedSTerm, setDebouncedSTerm] = useState<string>(searchTerm);
   const [results, setResults] = useState<ItemDetails[]>([]);
+  const errHandler = useErrorHandler();
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSTerm(searchTerm), 300);
@@ -17,14 +19,14 @@ function useDebouncedFetch(searchTerm: string, entityType: SearchEntity) {
 
   // term change / entity change handler
   useEffect(() => {
-    (async () => {
-      if (debouncedSTerm) {
-        setResults(await search[entityType](debouncedSTerm));
-      } else {
-        setResults([]);
-      }
-    })();
-  }, [debouncedSTerm, entityType]);
+    if (debouncedSTerm) {
+      search[entityType](debouncedSTerm)
+      .then(setResults)
+      .catch(errHandler);
+    } else {
+      setResults([]);
+    }
+  }, [debouncedSTerm, entityType, errHandler]);
 
   return results;
 }
