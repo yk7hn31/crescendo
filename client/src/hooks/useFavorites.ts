@@ -1,38 +1,25 @@
-import { useReducer, useEffect } from 'react';
+import { useContext } from "react";
+import { FavoritesDispatchCtx, FavoritesStateCtx } from "@/store/Favorites";
+import { FavoritesState } from "@/definitions/types";
 
-import { Favorites, FavoritesAction } from '@/definitions/types';
+function useFavoritesState(): FavoritesState {
+  const context = useContext(FavoritesStateCtx);
 
-const initialState: Favorites = { song: {}, album: {}, artist: {} };
-
-function favoritesReducer(state: Favorites, action: FavoritesAction): Favorites {
-  if (action.type === 'ADD') {
-    return { ...state,
-      [action.payload.type]: {
-        ...state[action.payload.type], [action.payload.id]: action.payload
-      }
-    };
-  } else if (action.type === 'REMOVE') {
-    const type = action.payload[0] == 'a' ? 'artist'
-    : action.payload[0] == 'c' ? 'album' : 'song';
-    const newState = { ...state, [type]: { ...state[type] } };
-    delete newState[type][action.payload];
-    return newState;
-  } else {
-    throw new Error('Invalid type for favoritesDispatch');
+  if (!context) {
+    throw new Error('useFavoritesState must be used within a FavoritesProvider');
   }
+
+  return context;
 }
 
-function useFavorites() {
-  const [favorites, favoritesDispatch] = useReducer(favoritesReducer, initialState, (init) => {
-    const item = localStorage.getItem('favorites');
-    return item ? JSON.parse(item) : init;
-  });
+function useFavoritesDispatch() {
+  const context = useContext(FavoritesDispatchCtx);
 
-  useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
+  if (!context) {
+    throw new Error('useFavoritesDispatch must be used within a FavoritesProvider');
+  }
 
-  return { favorites, favoritesDispatch };
+  return context;
 }
 
-export default useFavorites;
+export { useFavoritesState, useFavoritesDispatch };

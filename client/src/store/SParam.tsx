@@ -10,7 +10,7 @@ const sParamReducer = (state: SParamState, action: SParamAction): SParamState =>
     case 'SET_ENTITY_TYPE':
       return { ...state, entityType: action.payload };
     default:
-      throw new Error('Unknown action type');
+      return state;
   }
 }
 

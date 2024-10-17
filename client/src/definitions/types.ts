@@ -1,10 +1,15 @@
+export type SongID = `t${string}`;
+export type AlbumID = `c${string}`;
+export type ArtistID = `a${string}`;
+
 export type ItemType = 'song' | 'album' | 'artist';
+export type ItemID = SongID | AlbumID | ArtistID;
 export type SearchEntity = ItemType | 'all';
 
 export interface ItemDetails {
   title: string;
   type: ItemType;
-  id: string;
+  id: ItemID;
   genre: string;
   data?: Partial<{
     album: string;
@@ -16,15 +21,15 @@ export interface ItemDetails {
   }>;
 }
 
-export interface Favorites {
-  song: { [key: string]: ItemDetails; };
-  album: { [key: string]: ItemDetails; };
-  artist: { [key: string]: ItemDetails; };
+export interface FavoritesState {
+  song: SongID[];
+  album: AlbumID[];
+  artist: ArtistID[];
 }
 
-export type FavoritesAction =
-  | { type: 'ADD', payload: ItemDetails }
-  | { type: 'REMOVE', payload: string } // a[xxx] c[xxx] t[xxx]
+export type FavoritesAction = {
+  type: 'FAVORITES_ADD' | 'FAVORITES_REMOVE', id: ItemID
+}
 
 export type SParamState = {
   isFormActive: boolean;
@@ -37,12 +42,13 @@ export type SParamAction =
   | { type: 'SET_SEARCH_TERM', payload: string }
   | { type: 'SET_ENTITY_TYPE', payload: SearchEntity }
 
-export type PanelState = {
+export type PanelTarget = `lookup_${ItemID}` | `favrts_${ItemType}`;
+
+export interface PanelState {
   isPanelOpen: boolean;
-  panelItemId: string;
+  panelTarget: PanelTarget | null;
 }
 
 export type PanelAction =
-  | { type: 'SET_PANEL_OPEN', payload: boolean }
-  | { type: 'SET_PANEL_ITEM_KEY', payload: string }
-  | { type: 'SET_PANEL_BOTH', payload: PanelState }
+  | { type: 'OPEN_PANEL', panelTarget: PanelTarget }
+  | { type: 'CLOSE_PANEL' }

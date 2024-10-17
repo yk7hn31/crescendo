@@ -1,15 +1,16 @@
-import React, { type Dispatch } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 
+import { usePanelDispatch } from "@/hooks/usePanel";
+
 import { itemListVariants } from "@/definitions/variants";
-import type { ItemDetails, PanelAction } from "@/definitions/types";
+import type { ItemDetails } from "@/definitions/types";
 
 import { MusicItem, MusicItemSkeleton } from './MusicItem';
 
 interface MusicItemListProps {
   children: ItemDetails[];
   className?: string | number;
-  panelDispatch: Dispatch<PanelAction>;
   animate?: {
     initial: string;
     animate: string;
@@ -20,17 +21,19 @@ interface MusicItemListProps {
 }
 
 const MusicItemList: React.FC<MusicItemListProps>
- = ({ children, className, panelDispatch, animate, ...options }) => {
+ = ({ children, className, animate, ...options }) => {
+  const { openPanel } = usePanelDispatch();
+
   const items = children.length ? children.map((item: ItemDetails) => {
-    const handleItemClick = () => {
-      panelDispatch({ type: 'SET_PANEL_BOTH',
-        payload: { isPanelOpen: true, panelItemId: item.id }
-      });
-    }
     if (!options.displayDuration) delete item.data?.duration;
     if (!options.displayTrackNo) delete item.data?.trackNumber;
-    return <MusicItem key={item.id} onClick={handleItemClick} {...item} />
-  }) : <><MusicItemSkeleton /><MusicItemSkeleton /><MusicItemSkeleton /></>
+
+    return (
+      <MusicItem key={item.id} onClick={() => openPanel(`lookup_${item.id}`)} {...item} />
+    );
+  }) : <>
+    <MusicItemSkeleton /><MusicItemSkeleton /><MusicItemSkeleton />
+  </>
 
   if (animate) {
     return (

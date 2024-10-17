@@ -1,49 +1,22 @@
-import React, { useReducer } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { cn } from "@/lib/utils";
-import { useViewport } from "@/hooks/useViewport";
 import { useSParamState } from "@/hooks/useSParam";
-import useDebouncedFetch from "@/hooks/useDebouncedFetch";
-import useFavorites from "@/hooks/useFavorites";
+import useSearch from "@/hooks/useSearch";
 
-import type { PanelState, PanelAction, ItemDetails } from "@/definitions/types";
+import type { ItemDetails } from "@/definitions/types";
 import { contentDivVariants, springTransition } from "@/definitions/variants";
 
-import DetailsPanel from "./music/DetailsPanel";
 import SearchOpenButton from "./search/SearchOpenButton";
 import SearchForm from "./search/SearchForm";
 import MusicItemList from "./music/MusicItemList";
-import { Toaster } from "./ui/toaster";
 
-const panelReducer = (state: PanelState, action: PanelAction): PanelState => {
-  switch (action.type) {
-    case 'SET_PANEL_OPEN':
-      return { ...state, isPanelOpen: action.payload };
-    case 'SET_PANEL_ITEM_KEY':
-      return { ...state, panelItemId: action.payload };
-    case 'SET_PANEL_BOTH':
-      return { ...action.payload }
-  }
-}
-
-const Content: React.FC = () => {
-  const { isMobile } = useViewport();
+const Content: React.FC<{isMobile: boolean}> = ({isMobile}) => {
   const { isFormActive, searchTerm, entityType } = useSParamState();
-  const [panelState, panelDispatch] = useReducer(panelReducer, { isPanelOpen: false, panelItemId: '' });
-  const items: ItemDetails[] = useDebouncedFetch(searchTerm, entityType);
-  const { favorites, favoritesDispatch } = useFavorites();
+  const items: ItemDetails[] = useSearch(searchTerm, entityType);
 
-  return (
-  <>
-    <Toaster />
-    <DetailsPanel
-      isMobile={isMobile}
-      panelState={panelState}
-      panelDispatch={panelDispatch}
-      favorites={favorites}
-      favoritesDispatch={favoritesDispatch}
-    />
+  return (<>
     <AnimatePresence initial={false}>
       {(isMobile && !isFormActive) &&
       <SearchOpenButton key='search-button' />}
@@ -70,7 +43,6 @@ const Content: React.FC = () => {
           <MusicItemList 
             key='search-item-list'
             className={cn('w-full overflow-hidden', items.length && 'rounded-lg border')}
-            panelDispatch={panelDispatch}
             animate={{
               initial: 'hidden', animate: isFormActive ? 'visible' : 'hidden', exit: 'hidden'
             }}
@@ -80,8 +52,7 @@ const Content: React.FC = () => {
         </div>}
       </AnimatePresence>
     </motion.div>
-  </>
-  );
+  </>);
 }
 
 export default Content;

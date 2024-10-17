@@ -5,7 +5,7 @@ import { search } from "@/lib/music";
 
 import { ItemDetails, SearchEntity } from "@/definitions/types";
 
-function useDebouncedFetch(searchTerm: string, entityType: SearchEntity) {
+function useSearch(searchTerm: string, entityType: SearchEntity) {
   const [debouncedSTerm, setDebouncedSTerm] = useState<string>(searchTerm);
   const [results, setResults] = useState<ItemDetails[]>([]);
   const errHandler = useErrorHandler();
@@ -32,4 +32,4 @@ function useDebouncedFetch(searchTerm: string, entityType: SearchEntity) {
   return results;
 }
 
-export default useDebouncedFetch;
+export default useSearch;
