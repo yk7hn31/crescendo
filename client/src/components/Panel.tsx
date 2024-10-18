@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { lookup } from '@/lib/music';
 import { identifyType } from '@/lib/utils';
@@ -6,7 +6,7 @@ import { usePanelDispatch, usePanelState } from '@/hooks/usePanel';
 import { useFavoritesDispatch, useFavoritesState } from '@/hooks/useFavorites';
 import useErrorHandler from '@/hooks/useErrorHandler';
 
-import type { ItemDetails, ItemID, ItemType } from '@/definitions/types';
+import type { ItemDetails, ItemID, ItemType, FetchError } from '@/definitions/types';
 
 import MobilePanel from './panel/Mobile';
 import DesktopPanel from './panel/Desktop';
@@ -21,59 +21,69 @@ const Panel: React.FC<{isMobile: boolean}> = ({ isMobile }) => {
   const errHandler = useErrorHandler();
   const [contentList, setContentList] = useState<ItemDetails[]>([]);
 
-  const panelTargetKey = panelTarget?.slice(7) as ItemID | undefined;
-  const panelTargetType = panelTarget?.startsWith('favrts') ? 'favrts' : 'lookup';
+  const [panelTargetKey, panelTargetType] = useMemo(() => [
+    panelTarget?.slice(7) as ItemID | undefined,
+    panelTarget?.startsWith('favrts') ? 'favrts' : 'lookup'
+  ] as const, [panelTarget]);
+
   const PanelUIBody = panelTargetType === 'favrts' ? FavoritesPanelBody : LookupPanelBody;
   const PanelUI = isMobile ? MobilePanel : DesktopPanel;
-  let panelHeader: JSX.Element | undefined;
-  let panelFooter: JSX.Element | undefined;
-  const panelUIProps = {
+  
+  const fetchContent = useCallback(async () => {
+    if (!panelTargetKey) return;
+    // setContentList([]); TODO: choose if to use this or not
+    try {
+      if (panelTargetType === 'lookup') {
+        const type = identifyType(panelTargetKey);
+        const result = await lookup(panelTargetKey, type === 'artist' ? 10 : undefined);
+        setContentList(result);
+      } else if (panelTargetType === 'favrts') {
+        setContentList(getFavorites(panelTargetKey as ItemType));
+      }
+    } catch (err) {
+      errHandler(err as FetchError);
+    }
+  }, [panelTargetKey, panelTargetType, getFavorites, errHandler]);
+
+  useEffect(() => {
+    if (isPanelOpen) {
+      fetchContent();
+    } else {
+      const timeout = setTimeout(() => {
+        setContentList([]);
+      }, 300);
+      return () => clearTimeout(timeout);
+    }
+  }, [isPanelOpen, fetchContent]);
+  
+  const panelUIProps = useMemo(() => ({
     open: isPanelOpen,
     onClose: closePanel,
     onOpenChange: (isOpen: boolean) => {
       if (!isOpen) closePanel();
     }
-  }
+  }), [isPanelOpen, closePanel]);
 
-  useEffect(() => {
-    if (isPanelOpen && panelTargetKey && panelTarget) {
-      setContentList([]);
+  const { panelHeader, panelFooter } = useMemo(() => {
+    if (contentList.length > 0 && panelTarget && panelTargetKey) {
       if (panelTargetType === 'lookup') {
         const type = identifyType(panelTargetKey);
-        lookup(panelTargetKey, type === 'artist' ? 10 : undefined)
-        .then(setContentList)
-        .catch(errHandler);
+        const isFavorite = (favorites[type] as ItemID[]).includes(panelTargetKey);
+        return {
+          panelHeader: <LookupPanelHeader {...contentList[0]} />,
+          panelFooter: <LookupPanelFooter
+            isFavorite={isFavorite}
+            onClick={() =>
+              isFavorite ? removeFavorite(panelTargetKey) : addFavorite(contentList[0])
+            }
+          />
+        };
       } else if (panelTargetType === 'favrts') {
-        setContentList(getFavorites(panelTargetKey as ItemType));
+        return { panelHeader: <FavoritesPanelHeader /> };
       }
-    } else if (!isPanelOpen) {
-      console.log('closing; 0');
-      const timeout = setTimeout(() => {
-        setContentList([]);
-        console.log('closing; 300');
-      }, 300);
-      return () => clearTimeout(timeout);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPanelOpen, panelTarget, panelTargetKey, panelTargetType]);
-
-  if (contentList.length > 0 && panelTarget && panelTargetKey) {
-    if (panelTargetType === 'lookup') {
-      const type = identifyType(panelTargetKey);
-      const isFavorite = (favorites[type] as ItemID[]).includes(panelTargetKey);
-      panelHeader = <LookupPanelHeader {...contentList[0]} />;
-      panelFooter = (
-        <LookupPanelFooter
-          isFavorite={isFavorite}
-          onClick={() =>
-            isFavorite ? removeFavorite(panelTargetKey) : addFavorite(contentList[0])
-          }
-        />
-      );
-    } else if (panelTargetType === 'favrts') {
-      panelHeader = <FavoritesPanelHeader />;
-    }
-  }
+    return {panelHeader: undefined, panelFooter: undefined};
+  }, [contentList, panelTarget, panelTargetKey, panelTargetType, favorites, removeFavorite, addFavorite]);
 
   return (
     <PanelUI type={panelTargetType} header={panelHeader} footer={panelFooter} {...panelUIProps}>

@@ -1,30 +1,36 @@
-import { useContext } from "react";
-import type { PanelState, PanelTarget } from "@/definitions/types";
+import { useCallback, useContext, useMemo, type Dispatch } from "react";
+import type { PanelState, PanelTarget, PanelAction } from "@/definitions/types";
 import { PanelStateCtx, PanelDispatchCtx } from "@/store/Panel";
 
 function usePanelState(): PanelState {
-  const context = useContext(PanelStateCtx);
+  const state: PanelState = useContext(PanelStateCtx);
 
-  if (!context) {
+  if (!state) {
     throw new Error('usePanelState must be used within a PanelProvider');
   }
 
-  return context;
+  return state;
 }
 
 function usePanelDispatch() {
-  const context = useContext(PanelDispatchCtx);
+  const dispatch: Dispatch<PanelAction> = useContext(PanelDispatchCtx);
 
-  if (!context) {
+  if (!dispatch) {
     throw new Error('usePanelDispatch must be used within a PanelProvider');
   }
 
-  return {
-    openPanel: (panelTarget: PanelTarget) =>
-      context({ type: 'OPEN_PANEL', panelTarget }),
-    closePanel: () =>
-      context({ type: 'CLOSE_PANEL' })
-  };
+  const openPanel = useCallback((panelTarget: PanelTarget) => {
+    dispatch({ type: 'OPEN_PANEL', panelTarget })
+  }, [dispatch]);
+  const closePanel = useCallback(() => {
+    dispatch({ type: 'CLOSE_PANEL' });
+  }, [dispatch]);
+
+  const dispatchValue = useMemo(() => ({
+    openPanel, closePanel
+  }), [openPanel, closePanel]);
+
+  return dispatchValue;
 }
 
 export { usePanelState, usePanelDispatch };

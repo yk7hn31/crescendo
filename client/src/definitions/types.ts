@@ -52,3 +52,7 @@ export interface PanelState {
 export type PanelAction =
   | { type: 'OPEN_PANEL', panelTarget: PanelTarget }
   | { type: 'CLOSE_PANEL' }
+
+export interface FetchError extends Error {
+  code?: 'network' | 'json' | 'no-result';
+}

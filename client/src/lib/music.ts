@@ -1,18 +1,20 @@
-import type { SearchEntity, ItemDetails } from '@/definitions/types';
+import type { SearchEntity, ItemDetails, FetchError } from '@/definitions/types';
 import { convertType } from './utils';
 
 async function lookup(id: string, limit?: number) {
   const searchURI = `http://localhost:8080/lookup?id=${id}`;
   const response = await fetch(searchURI);
-  if (!response.ok) throw new Error(`0: network error; status code: ${response.status}`);
+  if (!response.ok) throw { code: 'network' } as FetchError;
   let lookupData;
 
   try {
     lookupData = await response.json();
-  } catch (jsonErr) {
-    throw new Error(`1: failed to parse JSON response: ${(jsonErr as Error).message}`);
+  } catch {
+    throw { code: 'json' } as FetchError;
   }
-  if (!lookupData.resultCount) throw new Error(`2: no result for: ${id}`);
+  if (!lookupData.resultCount) {
+    throw { code: 'no-result' } as FetchError;
+  }
 
   const results = lookupData.results.map(structSearchItems);
   return limit ? results.slice(0, limit - 1) : results;
@@ -21,15 +23,17 @@ async function lookup(id: string, limit?: number) {
 async function getSearchResult(term: string, type: SearchEntity) {
   const searchURI = `http://localhost:8080/search?term=${encodeURIComponent(term)}&entity=${type}`;
   const response = await fetch(searchURI);
-  if (!response.ok) throw new Error(`0: network error; status code: ${response.status}`);
+  if (!response.ok) throw { code: 'network' } as FetchError;
   let searchData;
 
   try {
     searchData = await response.json();
-  } catch (jsonErr) {
-    throw new Error(`1: failed to parse JSON response: ${(jsonErr as Error).message}`);
+  } catch {
+    throw { code: 'json' } as FetchError;
   }
-  if (!searchData.resultCount) throw new Error(`2: no result for: ${term}`);
+  if (!searchData.resultCount) {
+    throw { code: 'no-result' } as FetchError;
+  }
 
   return searchData.results.map(structSearchItems);
 }
