@@ -18,7 +18,7 @@ const SearchOpenButton: React.FC = () => {
 
   return (
     <motion.div
-      className='absolute flex w-full top-[40vh] justify-center'
+      className='absolute flex w-full top-[50vh] justify-center'
       variants={buttonVariants}
       initial='hidden'
       animate='visible'

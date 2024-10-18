@@ -22,7 +22,7 @@ const App: React.FC = () => {
           <Toaster />
           <Panel isMobile={isMobile} />
           <div className="h-screen overflow-hidden">
-            <Header />
+            <Header isMobile={isMobile} />
             <Content isMobile={isMobile} />
           </div>
           <FavoritesButton />

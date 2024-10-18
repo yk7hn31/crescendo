@@ -31,7 +31,7 @@ const Panel: React.FC<{isMobile: boolean}> = ({ isMobile }) => {
   
   const fetchContent = useCallback(async () => {
     if (!panelTargetKey) return;
-    // setContentList([]); TODO: choose if to use this or not
+    setContentList([]); // TODO: choose if to use this or not
     try {
       if (panelTargetType === 'lookup') {
         const type = identifyType(panelTargetKey);

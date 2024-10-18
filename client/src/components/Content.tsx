@@ -23,8 +23,8 @@ const Content: React.FC<{isMobile: boolean}> = ({isMobile}) => {
     </AnimatePresence>
     <motion.div 
       className={cn(
-        'absolute w-full flex flex-col items-center pb-6',
-        (!isMobile && !isFormActive) && 'translate-y-11')}
+        'absolute w-full flex flex-col items-center pb-6',)}
+        // (!isMobile && !isFormActive) && 'translate-y-11')}
       variants={contentDivVariants}
       initial='initial'
       animate={isFormActive ? 'focused' : 'initial'}
@@ -35,11 +35,11 @@ const Content: React.FC<{isMobile: boolean}> = ({isMobile}) => {
         <SearchForm
           key='search-form'
           className={cn('fixed p-4',
-            isMobile ? 'w-full' : 'w-7/12 max-w-[560px] min-w-[330px]')}
+            isMobile ? 'w-full' : 'w-7/12 max-w-[600px] min-w-[330px]')}
           isMobile={isMobile}
         />}
         {isFormActive && 
-        <div className={cn('mt-32 mx-4', isMobile ? 'w-full px-3' : 'w-7/12')}>
+        <div className={cn('mt-32 mx-4', isMobile ? 'w-full px-3' : 'w-7/12 max-w-[600px] min-w-[330px]')}>
           <MusicItemList 
             key='search-item-list'
             className={cn('w-full overflow-hidden', items.length && 'rounded-lg border')}

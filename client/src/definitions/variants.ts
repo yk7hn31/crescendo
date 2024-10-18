@@ -19,12 +19,12 @@ export const blurButtonVariants = {
 };
 
 export const buttonVariants = {
-  visible: { opacity: 1, y: 70 },
-  hidden: { opacity: 0, y: 90 }
+  visible: { opacity: 1, y: 10 },
+  hidden: { opacity: 0, y: 40 }
 };
 
 export const contentDivVariants = {
-  initial: { top: '40vh' },
+  initial: { top: '50vh' },
   focused: { top: 0 }
 }
 

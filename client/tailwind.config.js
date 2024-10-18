@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
   	extend: {
+			fontFamily: {
+				'mono': ['SFMono-Regular', 'IBM Plex Mono', 'monospace']
+			},
 			gridTemplateColumns: {
 				'auto-fill': 'repeat(auto-fill, minmax(230px, 1fr))'
 			},

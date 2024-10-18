@@ -5,12 +5,13 @@ Crescendo is a web app designed to streamline music discovery through a simple s
 ## Features
 
 - **Search Interface**: Users can search for music tracks, albums, and artists.
+- **Favorites**: Users can add or remove tracks, albums or artists to their favorites, saved in local storage.
 - **Custom Formatting**: Display results tailored based on the type of media (tracks, collections, artists).
 - **Responsive Design**: Optimized for a fluid experience across devices.
 
 ## Technologies
 
-- **Frontend**: React(w/shadcn-UI), TypeScript
+- **Frontend**: React + TypeScript
 - **Backend**: Go (API server)
 - **API**: iTunes Search API integration
 
@@ -41,6 +42,4 @@ npm i # at: crescendo/client
 
 ```sh
 npm run dev # at: crescendo/client
-cd ../server
-go run server.go # at: crescendo/server
 ```
