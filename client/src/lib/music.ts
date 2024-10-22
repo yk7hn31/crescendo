@@ -2,7 +2,7 @@ import type { SearchEntity, ItemDetails, FetchError } from '@/definitions/types'
 import { convertType } from './utils';
 
 async function lookup(id: string, limit?: number) {
-  const searchURI = `http://localhost:8080/lookup?id=${id}`;
+  const searchURI = `http://localhost:8080/api/lookup?id=${id}`;
   const response = await fetch(searchURI);
   if (!response.ok) throw { code: 'network' } as FetchError;
   let lookupData;
@@ -21,7 +21,7 @@ async function lookup(id: string, limit?: number) {
 }
 
 async function getSearchResult(term: string, type: SearchEntity) {
-  const searchURI = `http://localhost:8080/search?term=${encodeURIComponent(term)}&entity=${type}`;
+  const searchURI = `http://localhost:8080/api/search?term=${encodeURIComponent(term)}&entity=${type}`;
   const response = await fetch(searchURI);
   if (!response.ok) throw { code: 'network' } as FetchError;
   let searchData;

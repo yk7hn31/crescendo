@@ -33,7 +33,7 @@ const MusicItemList: React.FC<MusicItemListProps>
     );
   }) : <>
     <MusicItemSkeleton /><MusicItemSkeleton /><MusicItemSkeleton />
-  </>
+  </>;
 
   if (animate) {
     return (

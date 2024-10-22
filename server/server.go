@@ -9,11 +9,16 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/search", searchHandler)
-	http.HandleFunc("/lookup", lookupHandler)
+	staticPath := "./public"
+	fs := http.FileServer(http.Dir(staticPath))
+	http.Handle("/", fs)
 
-	fmt.Println("Server is running on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/api/search", searchHandler)
+	http.HandleFunc("/api/lookup", lookupHandler)
+
+	port := "8080"
+	fmt.Println("Server is running on port " + port + "...")
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 func setCommonHeaders(w http.ResponseWriter) {

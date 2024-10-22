@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import useErrorHandler from "./useErrorHandler";
 import { search } from "@/lib/music";
 
-import { ItemDetails, SearchEntity } from "@/definitions/types";
+import { FetchError, ItemDetails, SearchEntity } from "@/definitions/types";
 
 function useSearch(searchTerm: string, entityType: SearchEntity) {
   const [debouncedSTerm, setDebouncedSTerm] = useState<string>(searchTerm);
@@ -11,23 +11,31 @@ function useSearch(searchTerm: string, entityType: SearchEntity) {
   const errHandler = useErrorHandler();
 
   useEffect(() => {
-    const handler = setTimeout(() => setDebouncedSTerm(searchTerm), 300);
+    const handler = setTimeout(() => {
+      setDebouncedSTerm(searchTerm);
+    }, 300);
     return () => {
       clearTimeout(handler);
     }
   }, [searchTerm]);
 
+  const fetchData = useCallback(async () => {
+    try {
+      if (!debouncedSTerm) {
+        setResults([]);
+        return;
+      }
+      const result = await search[entityType](debouncedSTerm);
+      setResults(result);
+    } catch (e) {
+      errHandler(e as FetchError);
+    }
+  }, [debouncedSTerm, entityType, errHandler]);
+
   // term change / entity change handler
   useEffect(() => {
-    if (debouncedSTerm) {
-      search[entityType](debouncedSTerm)
-      .then(setResults)
-      .catch(errHandler);
-    } else {
-      setResults([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSTerm, entityType]);
+    fetchData();
+  }, [fetchData]);
 
   return results;
 }
